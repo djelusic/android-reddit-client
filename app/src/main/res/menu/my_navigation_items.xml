@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/drawer_frontpage"
+            android:title="Front" />
+        <item
+            android:id="@+id/drawer_subreddits"
+            android:title="Subreddits" />
+        <item
+            android:id="@+id/drawer_all"
+            android:title="/r/all" />
+        <item
+            android:id="@+id/drawer_options"
+            android:title="Options" />
+    </group>
+
+</menu>

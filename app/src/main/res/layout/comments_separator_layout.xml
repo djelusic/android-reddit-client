@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#F2F2F2">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+    <ImageView
+        android:id="@+id/upvote_arrow"
+        android:layout_width="wrap_content"
+        android:paddingLeft="10dp"
+        android:layout_alignParentLeft="true"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_keyboard_arrow_up_black_24dp"/>
+
+    <ImageView
+        android:id="@+id/downvote_arrow"
+        android:layout_width="wrap_content"
+        android:paddingLeft="5dp"
+        android:layout_toRightOf="@+id/upvote_arrow"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_keyboard_arrow_down_black_24dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/sortSpinner"
+        android:layout_alignBaseline="@id/sortSpinner"
+        android:text="Sort by: "
+        android:gravity="center"
+        android:paddingLeft="10dp"/>
+    <Spinner android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_alignParentRight="true"
+        android:id="@+id/sortSpinner"
+        android:title="Sort" />
+
+</RelativeLayout>
