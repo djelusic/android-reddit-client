@@ -13,11 +13,12 @@ import android.widget.TextView;
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.reddit_fetchers.PostFetcher;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
+import com.rael.daniel.drc.util.Consts;
 
 import java.util.List;
 
 /**
- * Created by Daniel on 06/10/2015.
+ * Fragment that displays fetched posts
  */
 public class PostsFragment extends ListFragment<RedditPost> {
 
@@ -80,43 +81,26 @@ public class PostsFragment extends ListFragment<RedditPost> {
     }
 
     @Override
-    void fetchAdditionalItems() {
-
-    }
-
-    @Override
-    void getAdditionalViews() {
-
-    }
-
     View fillItems(final List<RedditPost> posts, View convertView, final int position) {
-        TextView postTitle;
-        postTitle=(TextView)convertView
-                .findViewById(R.id.post_title);
 
-        TextView postDetails;
-        postDetails=(TextView)convertView
-                .findViewById(R.id.post_details);
+        ((TextView)convertView.findViewById(R.id.post_title))
+                .setText(posts.get(position).getTitle());
+        ((TextView)convertView.findViewById(R.id.post_details))
+                .setText(posts.get(position).getNumComments() + " comments");
+        ((TextView)convertView.findViewById(R.id.post_score))
+                .setText("Score: " + posts.get(position).getPoints());
+        //Adds subreddit name to the view (eg when displaying posts from /r/all)
+        if(showSubreddit) {
+            ((TextView) convertView.findViewById(R.id.post_subreddit))
+                    .setText(posts.get(position).getSubreddit());
+        }
 
-        TextView postScore;
-        postScore=(TextView)convertView
-                .findViewById(R.id.post_score);
-
-        TextView postSubreddit;
-        postSubreddit=(TextView)convertView
-                .findViewById(R.id.post_subreddit);
-
-        postTitle.setText(posts.get(position).getTitle());
-        postDetails.setText(posts.get(position).getNumComments() + " comments");
-        postScore.setText("Score: " + posts.get(position).getPoints());
-        if(showSubreddit)
-            postSubreddit.setText(posts.get(position).getSubreddit());
-
+        //Selfposts don't contain external links
         if(posts.get(position).getDomain().startsWith("self")) {
             convertView.findViewById(R.id.browser_image)
                     .setVisibility(View.GONE);
         }
-        else {
+        else { //Open link in a WebView fragment
             convertView.findViewById(R.id.browser_image)
                     .setOnClickListener(
                             new View.OnClickListener() {
@@ -137,12 +121,13 @@ public class PostsFragment extends ListFragment<RedditPost> {
         return convertView;
     }
 
+    @Override
     void setOnClick(final List<RedditPost> posts, ListView lView, int position) {
         lView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
-                String postUrl = "http://www.reddit.com" + posts.get(position).getPermalink() + ".json";
+                String postUrl = Consts.REDDIT_URL + posts.get(position).getPermalink() + ".json";
                 Fragment pf = CommentsFragment.newInstance(getActivity()
                         .getApplicationContext(), postUrl);
 

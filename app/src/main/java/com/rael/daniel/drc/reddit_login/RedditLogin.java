@@ -5,25 +5,26 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
+import com.rael.daniel.drc.util.Consts;
 
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 
+/**
+* Implementation of the Reddit login API
+* */
 public class RedditLogin {
-    // The login API URL
-    private final String REDDIT_LOGIN_URL = "https://ssl.reddit.com/api/login";
 
-    // The Reddit cookie string
-// This should be used by other methods after a successful login.
+    //Session cookie
     private String redditCookie = null;
-
     private Context applicationContext;
 
     public RedditLogin(Context applicationContext) {
         this.applicationContext = applicationContext;
     }
 
+    //Attempts to send login data and receive the session cookie
     private String getCookie(String url, String data){
         RedditConnectionManager rcm =
                 new RedditConnectionManager(applicationContext);
@@ -36,18 +37,19 @@ public class RedditLogin {
         else return null;
     }
 
+    //Modhash is required for some API calls (eg Vote)
     private String getModhash() {
         if(isLoggedIn()) {
             RedditConnectionManager rcm =
                     new RedditConnectionManager(applicationContext);
             try {
                 JSONObject data = new JSONObject(rcm.readContents(
-                        "http://www.reddit.com/api/me.json")).getJSONObject("data");
+                        Consts.REDDIT_URL + "/api/me.json")).getJSONObject("data");
                 String modhash = data.getString("modhash");
                 SharedPreferences.Editor edit = applicationContext
-                        .getSharedPreferences("com.rael.daniel.drc.SPREFS",
+                        .getSharedPreferences(Consts.SPREFS_NAME,
                                 Context.MODE_PRIVATE).edit();
-                edit.putString("Modhash", modhash).commit();
+                edit.putString("Modhash", modhash).apply();
                 return modhash;
             }
             catch(Exception e) { return null;}
@@ -56,19 +58,16 @@ public class RedditLogin {
 
     }
 
-
-    // This method lets you log in to Reddit.
-// It fetches the cookie which can be used in subsequent calls
-// to the Reddit API.
+    //Main login method, stores the session cookie and modhash
+    //in shared preferences
     public boolean login(String username, String password){
 
         RedditConnectionManager conn =
                 new RedditConnectionManager(applicationContext);
 
-        //Parameters that the API needs
         String data="user="+username+"&passwd="+password;
 
-        String cookie = getCookie(REDDIT_LOGIN_URL, data);
+        String cookie = getCookie(Consts.REDDIT_LOGIN_URL, data);
 
         if(cookie==null)
             return false;
@@ -83,25 +82,26 @@ public class RedditLogin {
             Log.d("Success", cookie);
             redditCookie = cookie;
             SharedPreferences.Editor edit = applicationContext
-                    .getSharedPreferences("com.rael.daniel.drc.SPREFS",
+                    .getSharedPreferences(Consts.SPREFS_NAME,
                             Context.MODE_PRIVATE).edit();
-            edit.putString("RedditCookie", cookie).commit();
-            edit.putBoolean("isLoggedIn", true).commit();
+            edit.putString("RedditCookie", cookie).apply();
+            edit.putBoolean("isLoggedIn", true).apply();
             getModhash();
             return true;
         }
         return false;
     }
 
+    //Sets the login flag to false
     public void logout() {
         SharedPreferences.Editor edit = applicationContext
-                .getSharedPreferences("com.rael.daniel.drc.SPREFS",
+                .getSharedPreferences(Consts.SPREFS_NAME,
                         Context.MODE_PRIVATE).edit();
-        edit.putBoolean("isLoggedIn", false).commit();
+        edit.putBoolean("isLoggedIn", false).apply();
     }
 
     public boolean isLoggedIn() {
-        return applicationContext.getSharedPreferences("com.rael.daniel.drc.SPREFS",
+        return applicationContext.getSharedPreferences(Consts.SPREFS_NAME,
                 Context.MODE_PRIVATE).getBoolean("isLoggedIn", false);
     }
 }

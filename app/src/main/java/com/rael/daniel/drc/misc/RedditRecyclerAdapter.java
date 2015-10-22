@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 /**
- * Created by Daniel on 12/10/2015.
+ * Adapter for recycler fragment
  */
 public abstract class RedditRecyclerAdapter<T> extends
         RecyclerView.Adapter<RecyclerView.ViewHolder> {

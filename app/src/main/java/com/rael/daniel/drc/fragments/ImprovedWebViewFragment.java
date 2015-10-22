@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
+/**
+ * Credit to bencallis @stackoverflow
+* */
 public class ImprovedWebViewFragment extends Fragment {
 
     private WebView mWebView;

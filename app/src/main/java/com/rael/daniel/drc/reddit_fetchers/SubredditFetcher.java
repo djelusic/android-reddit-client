@@ -7,6 +7,7 @@ import android.util.Log;
 import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
 import com.rael.daniel.drc.reddit_login.RedditLogin;
 import com.rael.daniel.drc.reddit_objects.RedditSubreddit;
+import com.rael.daniel.drc.util.Consts;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,7 +17,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * Fetches data from reddit API and turns it into a list of RedditSubreddit objects.
+ * Fetches a list of subreddits (subscribed subreddits if the user
+ * is logged in, defaults subs otherwise).
  */
 public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
 
@@ -26,8 +28,8 @@ public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
     public SubredditFetcher(Context applicationContext) {
         super(applicationContext);
         if(new RedditLogin(applicationContext).isLoggedIn())
-            url = "https://www.reddit.com/subreddits/mine/.json";
-        else url = "http://www.reddit.com/subreddits/default/.json";
+            url = Consts.REDDIT_URL + "/subreddits/mine/.json";
+        else url = Consts.REDDIT_URL + "/subreddits/default/.json";
         after = "";
     }
 
@@ -35,7 +37,7 @@ public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
         RedditConnectionManager conn =
                 new RedditConnectionManager(applicationContext);
         String rawData = conn.readContents(url);
-        List<RedditSubreddit> subredditList = new ArrayList<RedditSubreddit>();
+        List<RedditSubreddit> subredditList = new ArrayList<>();
 
         try {
             JSONObject data=new JSONObject(rawData)
@@ -63,7 +65,7 @@ public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
     }
 
     List<RedditSubreddit> getMoreSubreddits() {
-        url = "http://www.reddit.com/subreddits/default/.json"
+        url = Consts.REDDIT_URL + "/subreddits/default/.json"
                 +"?after=" + after;
 
         return getItems();

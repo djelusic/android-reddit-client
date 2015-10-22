@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Fetches data from reddit API and turns it into a list of RedditPost objects.
+ * Gets all posts in a given subreddit
  */
 public class PostFetcher extends ListFetcher<RedditPost> {
 
@@ -30,7 +30,7 @@ public class PostFetcher extends ListFetcher<RedditPost> {
         RedditConnectionManager conn =
                 new RedditConnectionManager(applicationContext);
         String rawData = conn.readContents(url);
-        List<RedditPost> postList = new ArrayList<RedditPost>();
+        List<RedditPost> postList = new ArrayList<>();
 
         try {
             JSONObject data=new JSONObject(rawData)
@@ -41,18 +41,18 @@ public class PostFetcher extends ListFetcher<RedditPost> {
             for(int i=0;i<children.length();i++){
                 JSONObject cur=children.getJSONObject(i)
                         .getJSONObject("data");
-                RedditPost th=new RedditPost();
-                th.setTitle(cur.optString("title"));
-                th.setUrl(cur.optString("url"));
-                th.setNumComments(cur.optInt("num_comments"));
-                th.setPoints(cur.optInt("score"));
-                th.setAuthor(cur.optString("author"));
-                th.setSubreddit(cur.optString("subreddit"));
-                th.setPermalink(cur.optString("permalink"));
-                th.setDomain(cur.optString("domain"));
-                th.setId(cur.optString("id"));
-                if(th.getTitle() !=null)
-                    postList.add(th);
+                RedditPost post=new RedditPost();
+                post.setTitle(cur.optString("title"));
+                post.setUrl(cur.optString("url"));
+                post.setNumComments(cur.optInt("num_comments"));
+                post.setPoints(cur.optInt("score"));
+                post.setAuthor(cur.optString("author"));
+                post.setSubreddit(cur.optString("subreddit"));
+                post.setPermalink(cur.optString("permalink"));
+                post.setDomain(cur.optString("domain"));
+                post.setId(cur.optString("id"));
+                if(post.getTitle() !=null)
+                    postList.add(post);
             }
         }
         catch(Exception e){

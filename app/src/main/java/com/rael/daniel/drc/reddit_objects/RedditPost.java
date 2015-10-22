@@ -1,7 +1,7 @@
 package com.rael.daniel.drc.reddit_objects;
 
 /**
- * Represents a thread on Reddit.
+ * Represents a post on Reddit.
  */
 public class RedditPost {
     private String subreddit;

@@ -18,6 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+* Used to connect to reddit and set appropriate headers for requests.
+* */
 public class RedditConnectionManager {
 
     Context applicationContext;
@@ -62,8 +65,8 @@ public class RedditConnectionManager {
         HttpURLConnection conn=getConnection(url);
         if(conn==null) return null;
         try{
-            StringBuffer sb=new StringBuffer(8192);
-            String tmp="";
+            StringBuilder sb=new StringBuilder(8192);
+            String tmp;
             BufferedReader br=new BufferedReader(
                     new InputStreamReader(
                             conn.getInputStream()

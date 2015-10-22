@@ -15,13 +15,11 @@ import android.widget.TextView;
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.reddit_fetchers.SubredditFetcher;
 import com.rael.daniel.drc.reddit_objects.RedditSubreddit;
+import com.rael.daniel.drc.util.Consts;
 
 import java.util.List;
 
 public class SubredditsFragment extends ListFragment<RedditSubreddit> {
-    ListView subredditsListView;
-    ArrayAdapter<RedditSubreddit> adapter;
-    Handler handler;
 
     public SubredditsFragment(){
         super();
@@ -62,7 +60,7 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
             public boolean onQueryTextSubmit(String query) {
                 Fragment sf = PostsFragment.newInstance(getActivity()
                         .getApplicationContext(),
-                        "http://www.reddit.com/r/" + query, false);
+                        Consts.REDDIT_URL + "/r/" + query, false);
 
                 getFragmentManager().beginTransaction()
                         .replace(R.id.fragments_container, sf)
@@ -79,30 +77,15 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
 
     }
 
-    @Override
-    void fetchAdditionalItems() {
-
-    }
-
-    @Override
-    void getAdditionalViews() {
-
-    }
-
     View fillItems(List<RedditSubreddit> subreddits, View convertView, int position) {
-        TextView subredditUrl;
-        subredditUrl=(TextView)convertView
-                .findViewById(R.id.subreddit_title);
-
-        TextView subredditTitle;
-        subredditTitle=(TextView)convertView
-                .findViewById(R.id.subreddit_description);
-
-        subredditUrl.setText(subreddits.get(position).getUrl());
-        subredditTitle.setText(subreddits.get(position).getTitle());
+        ((TextView)convertView.findViewById(R.id.subreddit_title))
+                .setText(subreddits.get(position).getUrl());
+        ((TextView)convertView.findViewById(R.id.subreddit_description))
+                .setText(subreddits.get(position).getTitle());
         return convertView;
     }
 
+    //Displays the contents of the clicked subreddit in a new fragment
     void setOnClick(final List<RedditSubreddit> subreddits, ListView lView, int position) {
         lView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -110,7 +93,7 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
                                     long id) {
                 String clickedSubreddit = subreddits.get(position).getUrl();
                 Fragment sf = PostsFragment.newInstance(getActivity()
-                        .getApplicationContext(), "http://www.reddit.com/r/" +
+                        .getApplicationContext(), Consts.REDDIT_URL + "/r/" +
                         clickedSubreddit, false);
 
                 getFragmentManager().beginTransaction()

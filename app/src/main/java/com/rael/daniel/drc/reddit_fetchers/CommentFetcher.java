@@ -15,6 +15,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+* Gets all the comments from a given post
+* */
 public class CommentFetcher extends ListFetcher<RedditComment> {
     private String url;
     private int startingDepth;
@@ -26,12 +29,13 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
 
     public CommentFetcher(Context applicationContext, String url, int startingDepth) {
         super(applicationContext);
+        //Remove garbage that gets appended when searching a subreddit
         this.url = url.replaceAll("\\?ref.*", ".json");
         this.startingDepth = startingDepth;
     }
 
     public List<RedditComment> getItems() {
-        List<RedditComment> comments = new ArrayList<RedditComment>();
+        List<RedditComment> comments = new ArrayList<>();
 
         RedditConnectionManager conn =
                 new RedditConnectionManager(applicationContext);
@@ -40,7 +44,7 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
     }
 
     public List<RedditComment> getItemsFromString(String rawData) {
-        List<RedditComment> comments = new ArrayList<RedditComment>();
+        List<RedditComment> comments = new ArrayList<>();
 
         try {
             JSONArray children = new JSONArray(rawData).getJSONObject(1)
@@ -52,20 +56,23 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
         return comments;
     }
 
+    //Gets the comments that were omitted from the initial thread
     public List<RedditComment> getMoreCommentsFromString(String rawData) {
-        List<RedditComment> moreComments = new ArrayList<RedditComment>();
+        List<RedditComment> moreComments = new ArrayList<>();
 
         try {
             JSONArray things = new JSONObject(rawData).getJSONObject("json")
                     .getJSONObject("data").getJSONArray("things");
             //getCommentsRecursive(moreComments, things, startingDepth);
+            //Can't call getCommentsRecursive here because reddit handles
+            //moreChildren calls differently than regular comments for some reason
             for(int i = 0; i < things.length(); i++) {
                 JSONObject commentData = things.getJSONObject(i)
                         .getJSONObject("data");
                 RedditComment currentComment = new RedditComment();
 
                 currentComment.setParentId(commentData.getString("parent_id"));
-                //calculate depth
+                //Calculate depth
                 currentComment.setDepth(startingDepth);
                 for(RedditComment rc : moreComments) {
                     if(rc.getName().equals(currentComment.getParentId())){
@@ -73,6 +80,7 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
                     }
                 }
 
+                //Handle "more comments" objects
                 if(things.getJSONObject(i).optString("kind").equals("more")) {
                     currentComment.setUser("more");
                     currentComment.setMoreChildren(JSONArrayConverter
@@ -99,12 +107,15 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
         return moreComments;
     }
 
+    //Recursively populates the main list with comments
     private void getCommentsRecursive(List<RedditComment> comments, JSONArray children, int depth) {
         try {
             for(int i = 0; i < children.length(); i++) {
                 JSONObject commentData = children.getJSONObject(i)
                         .getJSONObject("data");
                 RedditComment currentComment = new RedditComment();
+
+                //Handle "more comments" objects
                 if(children.getJSONObject(i).optString("kind").equals("more")) {
                     currentComment.setUser("more");
                     currentComment.setMoreChildren(JSONArrayConverter
@@ -135,6 +146,6 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
                 getCommentsRecursive(comments, replies, startingDepth + depth + 1);
             }
         }
-        catch(Exception e) {}
+        catch(Exception e) { e.printStackTrace(); }
     }
 }

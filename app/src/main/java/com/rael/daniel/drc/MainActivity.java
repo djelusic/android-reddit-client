@@ -14,6 +14,10 @@ import android.view.MenuItem;
 import com.rael.daniel.drc.fragments.PostsFragment;
 import com.rael.daniel.drc.fragments.SubredditsFragment;
 
+/**
+* Main activity, mostly acts as a container for fragments and
+* the navigation drawer.
+* */
 public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ActionBarDrawerToggle drawerToggle;
@@ -35,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
                 toolbar, R.string.drawer_open,  R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);
         addFragment();
+
+        //Set a backstack listener to correctly change fragment names
         getSupportFragmentManager().addOnBackStackChangedListener(
                 new FragmentManager.OnBackStackChangedListener() {
                     public void onBackStackChanged() {
@@ -60,9 +66,8 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    //Handles navigation drawer item selection
     public void selectDrawerItem(MenuItem menuItem) {
-        // Create a new fragment and specify the planet to show based on
-        // position
         Fragment fragment = null;
         String name = null;
 
@@ -83,9 +88,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
+        // Replace current fragment
+        getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragments_container, fragment)
                 .addToBackStack(name).commit();
 
@@ -122,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 .beginTransaction()
                 .add(R.id.fragments_container
                         , SubredditsFragment.newInstance(getApplicationContext()))
-                .addToBackStack("Subreddits")
+                .addToBackStack("Subreddits") //The default fragment
                 .commit();
     }
 }

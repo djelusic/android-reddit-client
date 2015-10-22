@@ -1,5 +1,8 @@
 package com.rael.daniel.drc.reddit_objects;
 
+/**
+ * Represents a comment on Reddit.
+ */
 public class RedditComment {
     private String user;
     private String text;

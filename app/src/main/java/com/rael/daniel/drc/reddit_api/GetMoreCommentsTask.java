@@ -6,16 +6,17 @@ import android.os.AsyncTask;
 import com.rael.daniel.drc.fragments.CommentsFragment;
 import com.rael.daniel.drc.reddit_fetchers.CommentFetcher;
 import com.rael.daniel.drc.reddit_objects.RedditComment;
+import com.rael.daniel.drc.util.Consts;
 
 import java.util.List;
 
 /**
- * Created by Daniel on 19/10/2015.
+ * Fetches more comments in background and adds them to the main list
  */
 public class GetMoreCommentsTask extends AsyncTask<Void, Void, List<RedditComment> > {
 
     private final String API_URL =
-            "http://www.reddit.com/api/morechildren.json";
+            Consts.REDDIT_URL + "/api/morechildren.json";
 
     private Context applicationContext;
     private List<RedditComment> comments;
@@ -57,7 +58,9 @@ public class GetMoreCommentsTask extends AsyncTask<Void, Void, List<RedditCommen
     @Override
     protected void onPostExecute(List<RedditComment> moreComments) {
         super.onPostExecute(moreComments);
+        //Remove the "more comments" stub
         comments.remove(position);
+        //Add fetches comments to comments list
         comments.addAll(position, moreComments);
         commentsFragment.notifyChange();
     }

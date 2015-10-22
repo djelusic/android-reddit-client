@@ -11,7 +11,6 @@ public class TimeSpan {
         Date start = new Date(t1);
         Date end = new Date(t2);
 
-
         long diffInSeconds = (end.getTime() - start.getTime());
 
         if (diffInSeconds < 60) return diffInSeconds + "s ago";

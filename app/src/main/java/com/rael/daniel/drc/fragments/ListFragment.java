@@ -22,21 +22,21 @@ import com.rael.daniel.drc.reddit_fetchers.ListFetcher;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Generic fragment for displaying content on Reddit
+* */
 public abstract class ListFragment<T> extends Fragment {
     ListView lView;
     ArrayAdapter<T> adapter;
     private List<T> list;
     ListFetcher<T> lFetcher;
     int layout_id, list_id, item_layout_id;
+    //Prevent adding headers multiple times
     boolean headersInitiated = false;
 
     public ListFragment(){
         setList(new ArrayList<T>());
         setHasOptionsMenu(true);
-    }
-
-    public static Fragment newInstance(){
-        return null; //implement later
     }
 
     public abstract void myRefresh();
@@ -58,6 +58,7 @@ public abstract class ListFragment<T> extends Fragment {
         inflater.inflate(R.menu.search_action_bar, menu);
     }
 
+    //Sets visibility of login/logout menu items
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
@@ -119,8 +120,10 @@ public abstract class ListFragment<T> extends Fragment {
                 protected void onPreExecute() {
                     super.onPreExecute();
                     // Show progress bar
-                    getView().findViewById(R.id.list_progress).
-                            setVisibility(View.VISIBLE);
+                    if(getView() != null) { //Make sure the fragment is still visible
+                        getView().findViewById(R.id.list_progress)
+                                .setVisibility(View.VISIBLE);
+                    }
                 }
 
                 @Override
@@ -128,7 +131,7 @@ public abstract class ListFragment<T> extends Fragment {
                     // populate the main list
                     getList().addAll(lFetcher.getItems());
                     // get any additional items (such as selfposts)
-                    fetchAdditionalItems();
+                    getAdditionalItems();
                     return null;
                 }
 
@@ -136,8 +139,10 @@ public abstract class ListFragment<T> extends Fragment {
                 protected void onPostExecute(Void aVoid) {
                     super.onPostExecute(aVoid);
                     // Hide progress bar
-                    getView().findViewById(R.id.list_progress)
-                            .setVisibility(View.GONE);
+                    if(getView() != null) {
+                        getView().findViewById(R.id.list_progress)
+                                .setVisibility(View.GONE);
+                    }
                     createAdapter();
                 }
             }.execute((Void)null);
@@ -152,11 +157,14 @@ public abstract class ListFragment<T> extends Fragment {
         headersInitiated = false;
     }
 
+
     protected int mGetViewTypeCount() {
+        //TODO
         return 1;
     }
 
     protected int mGetItemViewType(int position) {
+        //TODO
         return 0;
     }
 
@@ -185,6 +193,7 @@ public abstract class ListFragment<T> extends Fragment {
                     headersInitiated = true;
                 }
 
+                //Actual adapter implementation is delegated to superclass
                 convertView = fillItems(getList(), convertView, position);
                 setOnClick(getList(), lView, position);
                 return convertView;
@@ -203,8 +212,8 @@ public abstract class ListFragment<T> extends Fragment {
         lView.setAdapter(adapter);
     }
 
-    abstract void fetchAdditionalItems();
-    abstract void getAdditionalViews();
+    void getAdditionalItems() {} //Implement in superclass
+    void getAdditionalViews() {} //Implement in superclass
     abstract View fillItems(List<T> list, View convertView, int position);
     abstract void setOnClick(List<T> list, ListView lView, int position);
 

@@ -1,7 +1,7 @@
 package com.rael.daniel.drc.reddit_objects;
 
 /**
- * Created by Daniel on 15/10/2015.
+ * Represents a selfpost (main comment in a post)
  */
 public class RedditSelfPost {
     private String domain;
