@@ -3,13 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/more_comments_layout">
-    
-    <TextView
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textStyle="bold"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#0000EE"
-        android:padding="5dp"
-        android:text="more comments..."/>
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/moreCommentsBlue"
+            android:padding="5dp"
+            android:text="@string/more_comments"/>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+    </RelativeLayout>
+
 </LinearLayout>

@@ -24,4 +24,17 @@
     </string-array>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="sort_by">Sort by:</string>
+    <string name="sort">Sort</string>
+    <string name="more_comments">more comments...</string>
+    <string name="navigation">Navigation</string>
+    <string name="manual_search_subreddit">Manually search subreddits</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="refresh">Refresh</string>
+    <string name="front">Front</string>
+    <string name="subreddits">Subreddits</string>
+    <string name="all">/r/all</string>
+    <string name="options">Options</string>
+    <string name="loading">Loading...</string>
 </resources>

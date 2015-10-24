@@ -12,8 +12,26 @@ public class RedditComment {
     private String name;
     private String likes;
     private String parentId;
+    private String domain;
+    private String url;
     private String[] moreChildren;
     private int depth;
+
+    public boolean isMoreCommentsStub() {
+        return user.equals("more");
+    }
+
+    public boolean isSelfPost() {
+        return getDomain().startsWith("self");
+    }
+
+    public boolean isUpvoted() {
+        return likes.equals("true");
+    }
+
+    public boolean isDownvoted() {
+        return likes.equals("false");
+    }
 
     public String getUser() {
         return user;
@@ -93,5 +111,21 @@ public class RedditComment {
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

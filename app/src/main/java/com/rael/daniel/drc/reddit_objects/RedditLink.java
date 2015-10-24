@@ -1,9 +1,9 @@
 package com.rael.daniel.drc.reddit_objects;
 
 /**
- * Represents a selfpost (main comment in a post)
+ * Represents an external link or selfpost
  */
-public class RedditSelfPost {
+public class RedditLink {
     private String domain;
     private String subreddit;
     private String selftext;
@@ -13,6 +13,10 @@ public class RedditSelfPost {
     private String name;
     private String likes;
     private String date;
+
+    public boolean isSelfPost() {
+        return domain.startsWith("self");
+    }
 
     public String getDomain() {
         return domain;

@@ -23,7 +23,6 @@ import java.util.StringTokenizer;
 public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
 
     String url;
-    String after;
 
     public SubredditFetcher(Context applicationContext) {
         super(applicationContext);
@@ -64,8 +63,12 @@ public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
         return subredditList;
     }
 
-    List<RedditSubreddit> getMoreSubreddits() {
-        url = Consts.REDDIT_URL + "/subreddits/default/.json"
+    @Override
+    public List<RedditSubreddit> getMoreItems() {
+        if(new RedditLogin(applicationContext).isLoggedIn())
+            url = Consts.REDDIT_URL + "/subreddits/mine/.json"
+                    +"?after=" + after;
+        else url = Consts.REDDIT_URL + "/subreddits/default/.json"
                 +"?after=" + after;
 
         return getItems();

@@ -30,6 +30,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
         layout_id = R.layout.post_list_layout;
         item_layout_id = R.layout.post_item_layout;
         list_id = R.id.post_list;
+        loadMoreOnScroll = true;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
         getList().clear();
         lFetcher = new PostFetcher(getActivity()
                 .getApplicationContext(), url);
-        initialize();
+        initialize(false);
     }
 
     @Override
@@ -82,6 +83,11 @@ public class PostsFragment extends ListFragment<RedditPost> {
 
     @Override
     View fillItems(final List<RedditPost> posts, View convertView, final int position) {
+
+        if(convertView == null)
+            convertView=getActivity()
+                    .getLayoutInflater()
+                    .inflate(item_layout_id, null);
 
         ((TextView)convertView.findViewById(R.id.post_title))
                 .setText(posts.get(position).getTitle());

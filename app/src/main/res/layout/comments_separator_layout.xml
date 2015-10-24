@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#F2F2F2">
+    android:background="@color/commentGrey"
+    android:id="@+id/separator_outer_layout">
 
     <View
         android:layout_width="match_parent"
@@ -30,13 +31,13 @@
         android:layout_height="match_parent"
         android:layout_toLeftOf="@+id/sortSpinner"
         android:layout_alignBaseline="@id/sortSpinner"
-        android:text="Sort by: "
+        android:text="@string/sort_by"
         android:gravity="center"
         android:paddingLeft="10dp"/>
     <Spinner android:layout_height="match_parent"
         android:layout_width="wrap_content"
         android:layout_alignParentRight="true"
         android:id="@+id/sortSpinner"
-        android:title="Sort" />
+        android:title="@string/sort" />
 
 </RelativeLayout>

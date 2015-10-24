@@ -1,13 +1,11 @@
 package com.rael.daniel.drc.fragments;
 
 import android.content.Context;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.support.v7.widget.SearchView;
 import android.widget.TextView;
@@ -26,6 +24,7 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
         layout_id = R.layout.subreddit_list_layout;
         item_layout_id = R.layout.subreddit_item_layout;
         list_id = R.id.subreddit_list;
+        loadMoreOnScroll = true;
     }
 
     public static Fragment newInstance(Context applicationContext){
@@ -39,7 +38,7 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
         getList().clear();
         lFetcher = new SubredditFetcher(getActivity()
                 .getApplicationContext());
-        initialize();
+        initialize(false);
     }
 
     @Override
@@ -78,6 +77,10 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
     }
 
     View fillItems(List<RedditSubreddit> subreddits, View convertView, int position) {
+        if(convertView == null)
+            convertView=getActivity()
+                    .getLayoutInflater()
+                    .inflate(item_layout_id, null);
         ((TextView)convertView.findViewById(R.id.subreddit_title))
                 .setText(subreddits.get(position).getUrl());
         ((TextView)convertView.findViewById(R.id.subreddit_description))

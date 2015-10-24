@@ -68,7 +68,7 @@ public abstract class RecyclerFragment<T> extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.search_action_bar, menu);
+        /*inflater.inflate(R.menu.search_action_bar, menu);
         if(new RedditLogin(getActivity().getApplicationContext())
                 .isLoggedIn())
             menu.findItem(R.id.login).setVisible(false);
@@ -82,7 +82,7 @@ public abstract class RecyclerFragment<T> extends Fragment {
 // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(R.layout.sort_spinner_item);
 // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
+        spinner.setAdapter(adapter);*/
     }
 
     @Override

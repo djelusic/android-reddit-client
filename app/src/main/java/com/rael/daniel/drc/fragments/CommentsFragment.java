@@ -1,7 +1,8 @@
 package com.rael.daniel.drc.fragments;
 
+import android.app.ActionBar;
 import android.content.Context;
-import android.graphics.Color;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
@@ -10,10 +11,12 @@ import android.text.method.LinkMovementMethod;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -23,7 +26,7 @@ import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
 import com.rael.daniel.drc.reddit_fetchers.CommentFetcher;
 import com.rael.daniel.drc.reddit_objects.RedditComment;
-import com.rael.daniel.drc.reddit_objects.RedditSelfPost;
+import com.rael.daniel.drc.reddit_objects.RedditLink;
 import com.rael.daniel.drc.util.TimeSpan;
 
 import org.json.JSONArray;
@@ -38,20 +41,39 @@ import java.util.List;
 public class CommentsFragment extends ListFragment<RedditComment>{
 
     String url;
-    RedditSelfPost selfPost;
+    RedditComment link;
     private boolean spinnerInit = false;
+    View separatorView;
 
-    /*private final int VIEW_TYPE_COUNT = 4;
+    private final int VIEW_TYPE_COUNT = 4;
     private final int VIEW_TYPE_OP_COMMENT = 0;
     private final int VIEW_TYPE_COMMENT_SEPARATOR = 1;
     private final int VIEW_TYPE_REGULAR_COMMENT = 2;
-    private final int VIEW_TYPE_MORE_COMMENTS_PLACEHOLDER = 3;*/
+    private final int VIEW_TYPE_MORE_COMMENTS_STUB = 3;
 
     public CommentsFragment(){
         super();
         layout_id = R.layout.comment_list_layout;
         item_layout_id = R.layout.comment_item_layout;
         list_id = R.id.comment_list;
+        loadMoreOnScroll = false;
+    }
+
+    @Override
+    protected int mGetViewTypeCount() {
+        return VIEW_TYPE_COUNT;
+    }
+
+    @Override
+    protected int mGetItemViewType(int position) {
+        if(position == 0)
+            return VIEW_TYPE_OP_COMMENT;
+        if(position == 1)
+            return VIEW_TYPE_COMMENT_SEPARATOR;
+
+        if(getList().get(position - 2).isMoreCommentsStub())
+            return VIEW_TYPE_MORE_COMMENTS_STUB;
+        return VIEW_TYPE_REGULAR_COMMENT;
     }
 
     @Override
@@ -59,7 +81,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
         getList().clear();
         lFetcher = new CommentFetcher(getActivity()
                 .getApplicationContext(), url, 0);
-        initialize();
+        initialize(true);
     }
 
     public static Fragment newInstance(Context applicationContext, String url){
@@ -67,6 +89,11 @@ public class CommentsFragment extends ListFragment<RedditComment>{
         cf.url=url;
         cf.lFetcher =new CommentFetcher(applicationContext, cf.url, 0);
         return cf;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -124,63 +151,69 @@ public class CommentsFragment extends ListFragment<RedditComment>{
                     .getJSONArray("children")
                     .getJSONObject(0)
                     .getJSONObject("data");
-            selfPost = new RedditSelfPost();
-            selfPost.setSelftext(Html.fromHtml(selfPostData
+            link = new RedditComment();
+            link.setText(Html.fromHtml(selfPostData
                     .getString("selftext_html")).toString());
-            selfPost.setDomain(selfPostData.getString("domain"));
-            selfPost.setAuthor(selfPostData.getString("author"));
-            selfPost.setScore(selfPostData.getString("score"));
-            selfPost.setName(selfPostData.getString("name"));
-            selfPost.setLikes(selfPostData.getString("likes"));
-            selfPost.setDate(TimeSpan
+            link.setDomain(selfPostData.getString("domain"));
+            link.setUser(selfPostData.getString("author"));
+            link.setScore(selfPostData.getString("score"));
+            link.setName(selfPostData.getString("name"));
+            link.setLikes(selfPostData.getString("likes"));
+            link.setDate(TimeSpan
                     .calculateTimeSpan(new BigDecimal(selfPostData.getString("created_utc"))
                             .longValue(), System.currentTimeMillis() / 1000l));
         }
         catch(Exception e){ e.printStackTrace(); }
     }
 
+    private void setChildTextView(View parent, int childId, CharSequence text) {
+        ((TextView)parent.findViewById(childId)).setText(text);
+    }
+
+    private void fillCommentView(View commentView, RedditComment comment) {
+        setChildTextView(commentView, R.id.comment_user, comment.getUser());
+        setChildTextView(commentView, R.id.comment_score, comment.getScore());
+        Spanned spannedText = Html.fromHtml(comment.getText());
+        if (spannedText.length() > 2)
+            setChildTextView(commentView, R.id.comment_text,
+                    spannedText.subSequence(0, spannedText.length() - 2));
+        else setChildTextView(commentView, R.id.comment_text, "");
+        setChildTextView(commentView, R.id.comment_time, " points, " + comment.getDate());
+
+        TextView commentScore = (TextView)commentView.findViewById(R.id.comment_score);
+        if(comment.isUpvoted())
+            commentScore.setTextColor(ContextCompat.getColor(
+                    getContext(), R.color.upvoteOrange));
+        else if(comment.isDownvoted())
+            commentScore.setTextColor(ContextCompat.getColor(
+                    getContext(), R.color.downvoteBlue));
+        ((TextView)commentView.findViewById(R.id.comment_text))
+                .setMovementMethod(LinkMovementMethod.getInstance());
+
+    }
+
     @Override
     void getAdditionalViews() {
-        //Create view for selfpost
-        if(selfPost != null && selfPost.getDomain().startsWith("self")) {
-            View selfPostView = getActivity()
-                    .getLayoutInflater()
-                    .inflate(R.layout.comment_item_layout, lView, false);
+    }
 
-            TextView commentText = (TextView)selfPostView
-                    .findViewById(R.id.comment_text);
-            TextView commentScore = (TextView)selfPostView
-                    .findViewById(R.id.comment_score);
-
-            ((TextView)selfPostView.findViewById(R.id.comment_user))
-                    .setText(selfPost.getAuthor());
-            commentScore.setText(selfPost.getScore());
-            ((TextView)selfPostView.findViewById(R.id.comment_time))
-                    .setText(" points, " + selfPost.getDate());
-
-            if(selfPost.getLikes().equals("true")) {
-                commentScore.setTextColor(ContextCompat.getColor(
-                        getContext(), R.color.upvoteOrange));
-            }
-            else if(selfPost.getLikes().equals("false")) {
-                commentScore.setTextColor(ContextCompat.getColor(
-                        getContext(), R.color.downvoteBlue));
-            }
-
-            Spanned spannedText = Html.fromHtml(selfPost.getSelftext());
-            if (spannedText.length() > 2)
-                commentText.setText(spannedText.subSequence(0, spannedText.length() - 2));
-            else commentText.setText("");
-            //commentText.setText(Html.fromHtml(comments.get(position).text));
-            commentText.setMovementMethod(LinkMovementMethod.getInstance());
-            lView.addHeaderView(selfPostView);
+    private void addRedditCommentStyle(ViewGroup outerLayout, ViewGroup innerLayout, int position) {
+        innerLayout.setBackgroundResource(getList().get(position - 2).getDepth() % 2 == 0 ?
+                        R.drawable.borders_white : R.drawable.borders_grey);
+        for (int i = 0; i < getList().get(position - 2).getDepth(); i++) {
+            View v = new View(getContext());
+            v.setBackgroundResource(i % 2 == 0 ?
+                    R.drawable.borders_white : R.drawable.borders_grey);
+            //v.setBackgroundColor(i%2 == 0 ? Color.WHITE : Color.parseColor("#F2F2F2"));
+            v.setLayoutParams(new LinearLayout.LayoutParams(20, LinearLayout.
+                    LayoutParams.MATCH_PARENT));
+            outerLayout.addView(v, i);
         }
+    }
 
-        //Create view for separator between selfpost and comments
-        View separatorView=getActivity()
+    private void setupSpinner() {
+        separatorView = getActivity()
                 .getLayoutInflater()
                 .inflate(R.layout.comments_separator_layout, lView, false);
-        //Configure spinner for sorting options
         final Spinner spinner = (Spinner)separatorView.findViewById(R.id.sortSpinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
@@ -198,83 +231,61 @@ public class CommentsFragment extends ListFragment<RedditComment>{
                     url = url.replaceAll("json.*", "json?sort=" + selected);
                     myRefresh();
                 } else spinnerInit = true;
-
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
-        lView.addHeaderView(separatorView);
     }
 
     //Renders comments with alternating white/grey borders to improve visibility
     View fillItems(List<RedditComment> comments, View convertView, int position) {
 
-        //Handle "more comments" stubs
-        if(comments.get(position).getUser().equals("more")) {
-            convertView = getActivity()
-                    .getLayoutInflater()
-                    .inflate(R.layout.more_comments_layout, null);
-            LinearLayout moreLayout = (LinearLayout) convertView.findViewById(
-                    R.id.more_comments_layout);
-            moreLayout
-                    .setBackgroundResource(comments.get(position).getDepth() % 2 == 0 ?
-                            R.drawable.borders_white : R.drawable.borders_grey);
-            for (int i = 0; i < comments.get(position).getDepth(); i++) {
-                View v = new View(getContext());
-                v.setBackgroundResource(i % 2 == 0 ?
-                        R.drawable.borders_white : R.drawable.borders_grey);
-                //v.setBackgroundColor(i%2 == 0 ? Color.WHITE : Color.parseColor("#F2F2F2"));
-                v.setLayoutParams(new LinearLayout.LayoutParams(20, LinearLayout.
-                        LayoutParams.MATCH_PARENT));
-                moreLayout.addView(v, i);
-            }
+        if(mGetItemViewType(position) == VIEW_TYPE_OP_COMMENT &&
+                link != null && link.isSelfPost()) {
+            if(convertView == null)
+                convertView = getActivity()
+                        .getLayoutInflater()
+                        .inflate(R.layout.comment_item_layout, lView, false);
+            fillCommentView(convertView, link);
             return convertView;
         }
 
-        LinearLayout outerLayout = (LinearLayout) convertView.findViewById(
-                R.id.comment_outer_layout);
-        convertView.findViewById(R.id.comment_inner_layout)
-                .setBackgroundResource(comments.get(position).getDepth() % 2 == 0 ?
-                        R.drawable.borders_white : R.drawable.borders_grey);
-        for (int i = 0; i < comments.get(position).getDepth(); i++) {
-            View v = new View(getContext());
-            v.setBackgroundResource(i % 2 == 0 ?
-                    R.drawable.borders_white : R.drawable.borders_grey);
-            //v.setBackgroundColor(i%2 == 0 ? Color.WHITE : Color.parseColor("#F2F2F2"));
-            v.setLayoutParams(new LinearLayout.LayoutParams(20, LinearLayout.
-                    LayoutParams.MATCH_PARENT));
-            outerLayout.addView(v, i);
+        //Handle "more comments" stubs
+        if(mGetItemViewType(position) == VIEW_TYPE_MORE_COMMENTS_STUB) {
+            //Can't recycle view here because it will mess up the indentation
+            //TODO: find a way to do it :)
+            convertView = getActivity()
+                    .getLayoutInflater()
+                    .inflate(R.layout.more_comments_layout, lView, false);
+            LinearLayout moreLayout = (LinearLayout) convertView.findViewById(
+                    R.id.more_comments_layout);
+            addRedditCommentStyle(moreLayout, moreLayout, position);
+            return convertView;
         }
 
-        TextView commentScore = (TextView) convertView
-                .findViewById(R.id.comment_score);
-        TextView commentText = (TextView) convertView
-                .findViewById(R.id.comment_text);
-
-        ((TextView) convertView.findViewById(R.id.comment_user))
-                .setText(comments.get(position).getUser());
-        commentScore.setText(comments.get(position).getScore());
-        ((TextView) convertView.findViewById(R.id.comment_time))
-                .setText(" points, " + comments.get(position).getDate());
-
-        if(comments.get(position).getLikes().equals("true")) {
-            commentScore.setTextColor(ContextCompat
-                    .getColor(getContext(), R.color.upvoteOrange));
-        }
-        else if(comments.get(position).getLikes().equals("false")) {
-            commentScore.setTextColor(ContextCompat
-                    .getColor(getContext(), R.color.downvoteBlue));
+        if(mGetItemViewType(position) == VIEW_TYPE_COMMENT_SEPARATOR) {
+            if(separatorView == null) setupSpinner();
+            return separatorView;
         }
 
-        Spanned spannedText = Html.fromHtml(comments.get(position).getText());
-        if (spannedText.length() > 2)
-            commentText.setText(spannedText.subSequence(0, spannedText.length() - 2));
-        else commentText.setText("");
-        commentText.setMovementMethod(LinkMovementMethod.getInstance());
-        registerForContextMenu(lView);
+        //Regular comments
+        if(position > 1) {
+            //Can't recycle view here because it will mess up the indentation
+            //TODO: find a way to do it :)
+            convertView = getActivity()
+                    .getLayoutInflater()
+                    .inflate(item_layout_id, null);
+            ViewGroup outerLayout = (ViewGroup)convertView.
+                    findViewById(R.id.comment_outer_layout);
+            ViewGroup innerLayout = (ViewGroup)convertView.
+                    findViewById(R.id.comment_inner_layout);
+            addRedditCommentStyle(outerLayout, innerLayout, position);
+            fillCommentView(convertView, getList().get(position - 2));
+            registerForContextMenu(lView);
+            return convertView;
+        }
         return convertView;
     }
 
@@ -287,7 +298,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
                 //Load more comments if user touches a "more comments" stub
                 if(comments.get(position - 2).getUser().equals("more")) {
                     GetMoreCommentsTask tsk = new GetMoreCommentsTask(CommentsFragment.this,
-                            selfPost.getName(), position - 2);
+                            link.getName(), position - 2);
                     tsk.execute((Void)null);
                 }
             }

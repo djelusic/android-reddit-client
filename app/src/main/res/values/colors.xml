@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="upvoteOrange">#FF6600</color>
     <color name="downvoteBlue">#003366</color>
+    <color name="moreCommentsBlue">#0000EE</color>
+    <color name="commentGrey">#F2F2F2</color>
 </resources>

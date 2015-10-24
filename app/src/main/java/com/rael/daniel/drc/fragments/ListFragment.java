@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -31,8 +32,7 @@ public abstract class ListFragment<T> extends Fragment {
     private List<T> list;
     ListFetcher<T> lFetcher;
     int layout_id, list_id, item_layout_id;
-    //Prevent adding headers multiple times
-    boolean headersInitiated = false;
+    protected boolean loadMoreOnScroll;
 
     public ListFragment(){
         setList(new ArrayList<T>());
@@ -100,7 +100,7 @@ public abstract class ListFragment<T> extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initialize();
+        initialize(false);
     }
 
     // Refresh current fragment after logging in
@@ -111,7 +111,7 @@ public abstract class ListFragment<T> extends Fragment {
             myRefresh();
     }
 
-    protected void initialize(){
+    protected void initialize(final boolean isUpdate){
 
         if(getList().size()==0){
 
@@ -143,7 +143,9 @@ public abstract class ListFragment<T> extends Fragment {
                         getView().findViewById(R.id.list_progress)
                                 .setVisibility(View.GONE);
                     }
-                    createAdapter();
+                    if(isUpdate)
+                        notifyChange();
+                    else createAdapter();
                 }
             }.execute((Void)null);
         }else{
@@ -154,17 +156,14 @@ public abstract class ListFragment<T> extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        headersInitiated = false;
     }
 
 
     protected int mGetViewTypeCount() {
-        //TODO
         return 1;
     }
 
     protected int mGetItemViewType(int position) {
-        //TODO
         return 0;
     }
 
@@ -183,15 +182,10 @@ public abstract class ListFragment<T> extends Fragment {
                                 ViewGroup parent) {
 
                 //inflate list items
-                convertView=getActivity()
-                        .getLayoutInflater()
-                        .inflate(item_layout_id, null);
-
-                //inflate any header views (such as selfposts)
-                if(!headersInitiated) {
-                    getAdditionalViews();
-                    headersInitiated = true;
-                }
+                /*if(convertView == null)
+                    convertView=getActivity()
+                            .getLayoutInflater()
+                            .inflate(item_layout_id, null);*/
 
                 //Actual adapter implementation is delegated to superclass
                 convertView = fillItems(getList(), convertView, position);
@@ -210,6 +204,48 @@ public abstract class ListFragment<T> extends Fragment {
             }
         };
         lView.setAdapter(adapter);
+        if(loadMoreOnScroll) {
+            lView.setOnScrollListener(new AbsListView.OnScrollListener() {
+                private boolean isLoading = false;
+
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {}
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem,
+                                     int visibleItemCount, int totalItemCount) {
+                    int lastIndex = firstVisibleItem + visibleItemCount;
+                    if (lastIndex == getList().size() &&
+                            lFetcher.hasMoreItems() && !isLoading) {
+                        new AsyncTask<Void, Void, Void>() {
+                            View progressBar;
+                            @Override
+                            protected void onPreExecute() {
+                                progressBar = getActivity().getLayoutInflater()
+                                        .inflate(R.layout.small_progress_bar, null);
+                                lView.addFooterView(progressBar);
+                                super.onPreExecute();
+                                isLoading = true;
+                            }
+
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                list.addAll(lFetcher.getMoreItems());
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                super.onPostExecute(aVoid);
+                                notifyChange();
+                                isLoading = false;
+                                lView.removeFooterView(progressBar);
+                            }
+                        }.execute((Void)null);
+                    }
+                }
+            });
+        }
     }
 
     void getAdditionalItems() {} //Implement in superclass

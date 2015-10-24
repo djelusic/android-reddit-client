@@ -18,7 +18,6 @@ import java.util.List;
 public class PostFetcher extends ListFetcher<RedditPost> {
 
     String url;
-    String after;
 
     public PostFetcher(Context applicationContext, String url) {
         super(applicationContext);
@@ -61,11 +60,9 @@ public class PostFetcher extends ListFetcher<RedditPost> {
         return postList;
     }
 
-    List<RedditPost> getMorePosts() {
-        url +=  "/"
-                +".json"
-                +"?after=" + after;
-
+    @Override
+    public List<RedditPost> getMoreItems() {
+        url = url.replace(".json", ".json?after=" + after);
         return getItems();
     }
 }

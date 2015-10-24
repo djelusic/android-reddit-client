@@ -75,6 +75,7 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
                 //Calculate depth
                 currentComment.setDepth(startingDepth);
                 for(RedditComment rc : moreComments) {
+                    //TODO: find out why this throws exceptions sometimes
                     if(rc.getName().equals(currentComment.getParentId())){
                         currentComment.setDepth(rc.getDepth() + 1);
                     }
@@ -147,5 +148,11 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
             }
         }
         catch(Exception e) { e.printStackTrace(); }
+    }
+
+    @Override
+    public List<RedditComment> getMoreItems() {
+        //TODO: Not sure if this is needed
+        return null;
     }
 }
