@@ -99,6 +99,7 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
                 currentComment.setId(commentData.getString("id"));
                 currentComment.setName(commentData.getString("name"));
                 currentComment.setLikes(commentData.getString("likes"));
+                currentComment.setTitle(commentData.getString("title"));
 
                 moreComments.add(currentComment);
             }

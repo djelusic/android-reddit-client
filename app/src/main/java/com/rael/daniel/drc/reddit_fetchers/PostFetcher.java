@@ -5,10 +5,12 @@ import android.util.Log;
 
 import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
+import com.rael.daniel.drc.util.TimeSpan;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,11 @@ public class PostFetcher extends ListFetcher<RedditPost> {
                 post.setPermalink(cur.optString("permalink"));
                 post.setDomain(cur.optString("domain"));
                 post.setId(cur.optString("id"));
+                post.setName(cur.optString("name"));
+                post.setLikes(cur.optString("likes"));
+                post.setDate(TimeSpan
+                        .calculateTimeSpan(new BigDecimal(cur.getString("created_utc"))
+                                .longValue(), System.currentTimeMillis() / 1000l));
                 if(post.getTitle() !=null)
                     postList.add(post);
             }

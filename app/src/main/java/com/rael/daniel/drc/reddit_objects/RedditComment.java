@@ -14,6 +14,8 @@ public class RedditComment {
     private String parentId;
     private String domain;
     private String url;
+    private String numComments;
+    private String title;
     private String[] moreChildren;
     private int depth;
 
@@ -127,5 +129,21 @@ public class RedditComment {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getNumComments() {
+        return numComments;
+    }
+
+    public void setNumComments(String numComments) {
+        this.numComments = numComments;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

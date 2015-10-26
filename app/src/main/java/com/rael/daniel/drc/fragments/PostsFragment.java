@@ -1,16 +1,23 @@
 package com.rael.daniel.drc.fragments;
 
+import android.content.ClipData;
 import android.content.Context;
+import android.graphics.Color;
+import android.media.Image;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.rael.daniel.drc.R;
+import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 import com.rael.daniel.drc.reddit_fetchers.PostFetcher;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
 import com.rael.daniel.drc.util.Consts;
@@ -46,6 +53,10 @@ public class PostsFragment extends ListFragment<RedditPost> {
         super.onCreateOptionsMenu(menu, inflater);
         final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
                 .getActionView();
+        final MenuItem sortSubmenuContainer = menu.findItem(R.id.sort_submenu);
+        sortSubmenuContainer.setVisible(true);
+        final Menu sortSubmenu = sortSubmenuContainer.getSubMenu();
+
         sv.setQueryHint("Search this subreddit");
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -53,7 +64,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
                 query = query.replace(" ", "+");
                 Fragment sf = PostsFragment.newInstance(getActivity()
                                 .getApplicationContext(),
-                        url + "/search.json?q=" + query
+                        url + "search.json?q=" + query
                                 + "&restrict_sr=on&sort=relevance&t=all", false);
 
                 getFragmentManager().beginTransaction()
@@ -70,6 +81,32 @@ public class PostsFragment extends ListFragment<RedditPost> {
             }
         });
 
+    }
+
+    public void refreshFromUrl(String url) {
+        getList().clear();
+        lFetcher = new PostFetcher(getActivity()
+                .getApplicationContext(), url);
+        initialize(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(super.onOptionsItemSelected(item))
+            return true;
+        switch (item.getItemId()) {
+            case R.id.sort_hot:
+                refreshFromUrl(url + "hot");
+                return true;
+            case R.id.sort_new:
+                refreshFromUrl(url + "new");
+                return true;
+            case R.id.sort_top:
+                refreshFromUrl(url + "top");
+                return true;
+            default:
+                return false;
+        }
     }
 
     public static Fragment newInstance(Context applicationContext,
@@ -92,9 +129,37 @@ public class PostsFragment extends ListFragment<RedditPost> {
         ((TextView)convertView.findViewById(R.id.post_title))
                 .setText(posts.get(position).getTitle());
         ((TextView)convertView.findViewById(R.id.post_details))
+                .setText("submitted " + posts.get(position).getDate() + " ago by "
+                + posts.get(position).getAuthor() + " (" + posts.get(position).getDomain() + ")");
+        ((TextView)convertView.findViewById(R.id.post_comments))
                 .setText(posts.get(position).getNumComments() + " comments");
         ((TextView)convertView.findViewById(R.id.post_score))
-                .setText("Score: " + posts.get(position).getPoints());
+                .setText(String.valueOf(posts.get(position).getPoints()));
+
+        final TextView score = (TextView)convertView.findViewById(R.id.post_score);
+        final ImageView upvoteArrow = (ImageView)convertView.findViewById(R.id.upvote_arrow);
+        final ImageView downvoteArrow = (ImageView)convertView.findViewById(R.id.downvote_arrow);
+
+        //Make sure to reset colors in case view is recycled
+        upvoteArrow.setColorFilter(ContextCompat
+                .getColor(getContext(), android.R.color.darker_gray));
+        downvoteArrow.setColorFilter(ContextCompat
+                .getColor(getContext(), android.R.color.darker_gray));
+        score.setTextColor(ContextCompat
+                .getColor(getContext(), android.R.color.darker_gray));
+
+        if(posts.get(position).isUpvoted()) {
+            upvoteArrow.setColorFilter(ContextCompat
+                    .getColor(getContext(), R.color.upvoteOrange));
+            score.setTextColor(ContextCompat
+                    .getColor(getContext(), R.color.upvoteOrange));
+        }
+        else if(posts.get(position).isDownvoted()) {
+            downvoteArrow.setColorFilter(ContextCompat
+                    .getColor(getContext(), R.color.downvoteBlue));
+            score.setTextColor(ContextCompat
+                    .getColor(getContext(), R.color.downvoteBlue));
+        }
         //Adds subreddit name to the view (eg when displaying posts from /r/all)
         if(showSubreddit) {
             ((TextView) convertView.findViewById(R.id.post_subreddit))
@@ -107,6 +172,8 @@ public class PostsFragment extends ListFragment<RedditPost> {
                     .setVisibility(View.GONE);
         }
         else { //Open link in a WebView fragment
+            convertView.findViewById(R.id.browser_image)
+                    .setVisibility(View.VISIBLE);
             convertView.findViewById(R.id.browser_image)
                     .setOnClickListener(
                             new View.OnClickListener() {
@@ -124,6 +191,34 @@ public class PostsFragment extends ListFragment<RedditPost> {
                             }
                     );
         }
+
+        //Set onclick listeners for upvote/downvote arrows
+        upvoteArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new RedditAPICommon(getActivity().getApplicationContext())
+                        .vote(getList().get(position).getName(), 1);
+                upvoteArrow.setColorFilter(ContextCompat
+                        .getColor(getContext(), R.color.upvoteOrange));
+                downvoteArrow.setColorFilter(ContextCompat
+                        .getColor(getContext(), android.R.color.darker_gray));
+                score.setTextColor(ContextCompat
+                        .getColor(getContext(), R.color.upvoteOrange));
+            }
+        });
+        downvoteArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new RedditAPICommon(getActivity().getApplicationContext())
+                        .vote(getList().get(position).getName(), -1);
+                downvoteArrow.setColorFilter(ContextCompat
+                        .getColor(getContext(), R.color.downvoteBlue));
+                upvoteArrow.setColorFilter(ContextCompat
+                        .getColor(getContext(), android.R.color.darker_gray));
+                score.setTextColor(ContextCompat
+                        .getColor(getContext(), R.color.downvoteBlue));
+            }
+        });
         return convertView;
     }
 

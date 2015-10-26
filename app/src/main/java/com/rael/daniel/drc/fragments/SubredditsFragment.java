@@ -1,11 +1,13 @@
 package com.rael.daniel.drc.fragments;
 
 import android.content.Context;
+import android.media.Image;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.support.v7.widget.SearchView;
 import android.widget.TextView;
@@ -97,7 +99,7 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
                 String clickedSubreddit = subreddits.get(position).getUrl();
                 Fragment sf = PostsFragment.newInstance(getActivity()
                         .getApplicationContext(), Consts.REDDIT_URL + "/r/" +
-                        clickedSubreddit, false);
+                        clickedSubreddit + "/", false);
 
                 getFragmentManager().beginTransaction()
                         .replace(R.id.fragments_container, sf)

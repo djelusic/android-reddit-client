@@ -15,6 +15,7 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.rael.daniel.drc.MainActivity;
 import com.rael.daniel.drc.reddit_login.LoginActivity;
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.reddit_login.RedditLogin;
@@ -86,6 +87,7 @@ public abstract class ListFragment<T> extends Fragment {
                 return true;
             case R.id.refresh_button:
                 myRefresh();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -95,6 +97,15 @@ public abstract class ListFragment<T> extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(((MainActivity)getActivity()).isStateChanged()) {
+            myRefresh();
+            ((MainActivity)getActivity()).setStateChanged(false);
+        }
     }
 
     @Override
@@ -215,8 +226,8 @@ public abstract class ListFragment<T> extends Fragment {
                 public void onScroll(AbsListView view, int firstVisibleItem,
                                      int visibleItemCount, int totalItemCount) {
                     int lastIndex = firstVisibleItem + visibleItemCount;
-                    if (lastIndex == getList().size() &&
-                            lFetcher.hasMoreItems() && !isLoading) {
+                    if (totalItemCount >0 && lastIndex == getList()
+                            .size() && lFetcher.hasMoreItems() && !isLoading) {
                         new AsyncTask<Void, Void, Void>() {
                             View progressBar;
                             @Override

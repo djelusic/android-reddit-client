@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.rael.daniel.drc.fragments.ListFragment;
 import com.rael.daniel.drc.fragments.PostsFragment;
 import com.rael.daniel.drc.fragments.SubredditsFragment;
 
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navDrawer;
     private DrawerLayout drawerLayout;
+    private boolean stateChanged = false;
 
 
     @Override
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch(menuItem.getItemId()) {
             case R.id.drawer_frontpage:
-                fragment = PostsFragment.newInstance(this, "http://www.reddit.com", true);
+                fragment = PostsFragment.newInstance(this, "http://www.reddit.com/", true);
                 name = "Front";
                 break;
             case R.id.drawer_subreddits:
@@ -81,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 name = "Subreddits";
                 break;
             case R.id.drawer_all:
-                fragment = PostsFragment.newInstance(this, "http://www.reddit.com/r/all", true);
+                fragment = PostsFragment.newInstance(this, "http://www.reddit.com/r/all/", true);
                 name = "all";
                 break;
             default:
@@ -128,5 +130,14 @@ public class MainActivity extends AppCompatActivity {
                         , SubredditsFragment.newInstance(getApplicationContext()))
                 .addToBackStack("Subreddits") //The default fragment
                 .commit();
+    }
+
+    public boolean isStateChanged() {
+        return stateChanged;
+    }
+
+    //Set to true when fragment on backstack needs to reload
+    public void setStateChanged(boolean stateChangedFlag) {
+        this.stateChanged = stateChangedFlag;
     }
 }

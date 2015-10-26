@@ -13,6 +13,19 @@
     <item android:id="@+id/logout"
         android:title="@string/logout"/>
 
+    <item android:title="Sort"
+        android:id="@+id/sort_submenu"
+        android:visible="false">
+        <menu>
+            <item android:id="@+id/sort_hot"
+                android:title="hot" />
+            <item android:id="@+id/sort_new"
+                android:title="new" />
+            <item android:id="@+id/sort_top"
+                android:title="top" />
+        </menu>
+    </item>
+
     <item android:id="@+id/refresh_button"
         android:title="@string/refresh"
         android:icon="@drawable/ic_refresh_white_24dp"

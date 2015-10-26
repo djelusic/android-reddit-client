@@ -13,6 +13,17 @@ public class RedditPost {
     private String url;
     private String domain;
     private String id;
+    private String name;
+    private String likes;
+    private String date;
+
+    public boolean isUpvoted() {
+        return likes.equals("true");
+    }
+
+    public boolean isDownvoted() {
+        return likes.equals("false");
+    }
 
     public String getSubreddit() {
         return subreddit;
@@ -84,5 +95,29 @@ public class RedditPost {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLikes() {
+        return likes;
+    }
+
+    public void setLikes(String likes) {
+        this.likes = likes;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

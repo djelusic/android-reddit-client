@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.rael.daniel.drc.reddit_login.RedditLogin;
+import com.rael.daniel.drc.util.Consts;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class RedditConnectionManager {
                 conn.setRequestProperty("X-Modhash",
                         pref.getString("Modhash", null));
             }
-            conn.setRequestProperty("User-Agent", "android:com.rael.daniel.drc:v0.1 (by /u/rurushu)");
+            conn.setRequestProperty("User-Agent", Consts.USER_AGENT);
         } catch (MalformedURLException e) {
             Log.e("getConnection()",
                     "Invalid URL: " + e.toString());

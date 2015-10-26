@@ -10,7 +10,7 @@
         android:layout_height="1dp"
         android:background="?android:attr/listDivider" />
 
-    <ImageView
+    <!--<ImageView
         android:id="@+id/upvote_arrow"
         android:layout_width="wrap_content"
         android:paddingLeft="10dp"
@@ -24,7 +24,15 @@
         android:paddingLeft="5dp"
         android:layout_toRightOf="@+id/upvote_arrow"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_keyboard_arrow_down_black_24dp"/>
+        android:src="@drawable/ic_keyboard_arrow_down_black_24dp"/>-->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/num_comments"
+        android:paddingLeft="10dp"
+        android:layout_alignBaseline="@+id/sortSpinner"
+        android:gravity="center"/>
 
     <TextView
         android:layout_width="wrap_content"
