@@ -30,7 +30,7 @@ public class RedditLogin {
                 new RedditConnectionManager(applicationContext);
         HttpURLConnection con=rcm.getConnection(url);
         con.setDoOutput(true);
-        if(rcm.writeContents(con, data)) {
+        if(rcm.postRequest(con, data) != null) {
             redditCookie = con.getHeaderField("set-cookie");
             return redditCookie;
         }

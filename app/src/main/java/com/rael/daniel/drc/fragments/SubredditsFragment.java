@@ -61,7 +61,7 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
             public boolean onQueryTextSubmit(String query) {
                 Fragment sf = PostsFragment.newInstance(getActivity()
                         .getApplicationContext(),
-                        Consts.REDDIT_URL + "/r/" + query, false);
+                        query, null, null, false);
 
                 getFragmentManager().beginTransaction()
                         .replace(R.id.fragments_container, sf)
@@ -98,8 +98,7 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
                                     long id) {
                 String clickedSubreddit = subreddits.get(position).getUrl();
                 Fragment sf = PostsFragment.newInstance(getActivity()
-                        .getApplicationContext(), Consts.REDDIT_URL + "/r/" +
-                        clickedSubreddit + "/", false);
+                        .getApplicationContext(), clickedSubreddit, null, null, false);
 
                 getFragmentManager().beginTransaction()
                         .replace(R.id.fragments_container, sf)

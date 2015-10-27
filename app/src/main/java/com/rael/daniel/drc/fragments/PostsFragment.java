@@ -2,6 +2,7 @@ package com.rael.daniel.drc.fragments;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.rael.daniel.drc.R;
+import com.rael.daniel.drc.activities.SubmitActivity;
 import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 import com.rael.daniel.drc.reddit_fetchers.PostFetcher;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
@@ -29,7 +31,9 @@ import java.util.List;
  */
 public class PostsFragment extends ListFragment<RedditPost> {
 
-    String url;
+    String subreddit;
+    String requestBody; //For search requests
+    String sortingType;
     private boolean showSubreddit;
 
     public PostsFragment(){
@@ -40,11 +44,29 @@ public class PostsFragment extends ListFragment<RedditPost> {
         loadMoreOnScroll = true;
     }
 
+    public String createUrl() {
+        if(subreddit == null) { //Frontpage
+            if(sortingType == null) return Consts.REDDIT_URL;
+            return Consts.REDDIT_URL + "/" + sortingType;
+        }
+        if(requestBody == null) { //Regular subreddit post listing
+            if(sortingType == null) return Consts.REDDIT_URL +
+                    "/r/" + subreddit;
+            return Consts.REDDIT_URL + "/r/" +
+                    subreddit + "/" + sortingType;
+        }
+        //This is for search requests
+        requestBody = requestBody.replaceAll("sort=.*&",
+                "sort=" + sortingType + "&");
+        return Consts.REDDIT_URL + "/r/" +
+                subreddit + "/" + "search.json?" + requestBody;
+    }
+
     @Override
     public void myRefresh() {
         getList().clear();
         lFetcher = new PostFetcher(getActivity()
-                .getApplicationContext(), url);
+                .getApplicationContext(), createUrl());
         initialize(false);
     }
 
@@ -55,6 +77,8 @@ public class PostsFragment extends ListFragment<RedditPost> {
                 .getActionView();
         final MenuItem sortSubmenuContainer = menu.findItem(R.id.sort_submenu);
         sortSubmenuContainer.setVisible(true);
+        final MenuItem submit = menu.findItem(R.id.submit_menu_item);
+        submit.setVisible(true);
         final Menu sortSubmenu = sortSubmenuContainer.getSubMenu();
 
         sv.setQueryHint("Search this subreddit");
@@ -64,8 +88,8 @@ public class PostsFragment extends ListFragment<RedditPost> {
                 query = query.replace(" ", "+");
                 Fragment sf = PostsFragment.newInstance(getActivity()
                                 .getApplicationContext(),
-                        url + "search.json?q=" + query
-                                + "&restrict_sr=on&sort=relevance&t=all", false);
+                        subreddit, "q=" + query + "&restrict_sr=on&sort=relevance&t=all",
+                        "relevance", false);
 
                 getFragmentManager().beginTransaction()
                         .replace(R.id.fragments_container, sf)
@@ -83,37 +107,46 @@ public class PostsFragment extends ListFragment<RedditPost> {
 
     }
 
-    public void refreshFromUrl(String url) {
-        getList().clear();
-        lFetcher = new PostFetcher(getActivity()
-                .getApplicationContext(), url);
-        initialize(false);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(super.onOptionsItemSelected(item))
             return true;
         switch (item.getItemId()) {
             case R.id.sort_hot:
-                refreshFromUrl(url + "hot");
+                sortingType = "hot";
+                myRefresh();
                 return true;
             case R.id.sort_new:
-                refreshFromUrl(url + "new");
+                sortingType = "new";
+                myRefresh();
                 return true;
             case R.id.sort_top:
-                refreshFromUrl(url + "top");
+                sortingType = "top";
+                myRefresh();
                 return true;
+            case R.id.submit_menu_item:
+                Intent i = new Intent(getContext(), SubmitActivity.class);
+                i.putExtra("subreddit", subreddit);
+                startActivityForResult(i, 0);
             default:
                 return false;
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        myRefresh();
+    }
+
     public static Fragment newInstance(Context applicationContext,
-                                       String url, boolean showSubreddit){
+                                       String subreddit, String requestBody,
+                                       String sortingType, boolean showSubreddit){
         PostsFragment pf=new PostsFragment();
-        pf.url =url;
-        pf.lFetcher =new PostFetcher(applicationContext, pf.url);
+        pf.subreddit =subreddit;
+        pf.requestBody =requestBody;
+        pf.sortingType =sortingType;
+        pf.lFetcher =new PostFetcher(applicationContext, pf.createUrl());
         pf.showSubreddit = showSubreddit;
         return pf;
     }

@@ -1,6 +1,5 @@
 package com.rael.daniel.drc.fragments;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,23 +15,20 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.rael.daniel.drc.MainActivity;
+import com.rael.daniel.drc.activities.MainActivity;
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.reddit_api.GetMoreCommentsTask;
 import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
 import com.rael.daniel.drc.reddit_fetchers.CommentFetcher;
 import com.rael.daniel.drc.reddit_objects.RedditComment;
-import com.rael.daniel.drc.reddit_objects.RedditLink;
 import com.rael.daniel.drc.util.TimeSpan;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.math.BigDecimal;
 import java.util.List;

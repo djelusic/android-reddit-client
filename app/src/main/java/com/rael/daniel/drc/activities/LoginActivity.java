@@ -1,4 +1,4 @@
-package com.rael.daniel.drc.reddit_login;
+package com.rael.daniel.drc.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -30,6 +30,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.rael.daniel.drc.R;
+import com.rael.daniel.drc.reddit_login.RedditLogin;
 
 import java.util.ArrayList;
 import java.util.List;

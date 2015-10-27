@@ -1,4 +1,4 @@
-package com.rael.daniel.drc;
+package com.rael.daniel.drc.activities;
 
 import android.content.res.Configuration;
 import android.support.design.widget.NavigationView;
@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.fragments.ListFragment;
 import com.rael.daniel.drc.fragments.PostsFragment;
 import com.rael.daniel.drc.fragments.SubredditsFragment;
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch(menuItem.getItemId()) {
             case R.id.drawer_frontpage:
-                fragment = PostsFragment.newInstance(this, "http://www.reddit.com/", true);
+                fragment = PostsFragment.newInstance(this, null, null, null, true);
                 name = "Front";
                 break;
             case R.id.drawer_subreddits:
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 name = "Subreddits";
                 break;
             case R.id.drawer_all:
-                fragment = PostsFragment.newInstance(this, "http://www.reddit.com/r/all/", true);
+                fragment = PostsFragment.newInstance(this, "all", null, null, true);
                 name = "all";
                 break;
             default:

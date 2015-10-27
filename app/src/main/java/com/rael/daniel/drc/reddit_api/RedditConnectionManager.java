@@ -83,7 +83,7 @@ public class RedditConnectionManager {
         }
     }
 
-    public boolean writeContents(final HttpURLConnection con, final String data) {
+    public String postRequest(final HttpURLConnection con, final String data) {
         try{
             con.setRequestMethod("POST");
             PrintWriter pw=new PrintWriter(
@@ -94,41 +94,27 @@ public class RedditConnectionManager {
             pw.write(data);
             pw.close();
 
-            StringBuilder builder = new StringBuilder();
-            builder.append(con.getResponseCode())
-                    .append(" ")
-                    .append(con.getResponseMessage())
-                    .append("\n");
-
-            Map<String, List<String>> map = con.getHeaderFields();
-            for (Map.Entry<String, List<String>> entry : map.entrySet())
-            {
-                if (entry.getKey() == null)
-                    continue;
-                builder.append( entry.getKey())
-                        .append(": ");
-
-                List<String> headerValues = entry.getValue();
-                Iterator<String> it = headerValues.iterator();
-                if (it.hasNext()) {
-                    builder.append(it.next());
-
-                    while (it.hasNext()) {
-                        builder.append(", ")
-                                .append(it.next());
-                    }
-                }
-
-                builder.append("\n");
+            try{
+                StringBuilder sb=new StringBuilder(8192);
+                String tmp;
+                BufferedReader br=new BufferedReader(
+                        new InputStreamReader(
+                                con.getInputStream()
+                        )
+                );
+                while((tmp=br.readLine())!=null)
+                    sb.append(tmp).append("\n");
+                br.close();
+                Log.d("response", sb.toString());
+                return sb.toString();
+            }catch(IOException e){
+                Log.d("READ FAILED", e.toString());
+                return null;
             }
-            Log.d("response", builder.toString());
-
-            return con.getResponseCode() == HttpURLConnection.HTTP_OK;
-
 
         }catch(IOException e){
-            Log.d("Unable to write", e.toString());
-            return false;
+            e.printStackTrace();
+            return null;
         }
     }
 

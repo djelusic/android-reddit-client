@@ -15,8 +15,8 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.rael.daniel.drc.MainActivity;
-import com.rael.daniel.drc.reddit_login.LoginActivity;
+import com.rael.daniel.drc.activities.MainActivity;
+import com.rael.daniel.drc.activities.LoginActivity;
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.reddit_login.RedditLogin;
 import com.rael.daniel.drc.reddit_fetchers.ListFetcher;

@@ -53,7 +53,7 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Fragment sf = PostsFragment.newInstance(getActivity()
-                        .getApplicationContext(), query, false);
+                        .getApplicationContext(), query, null, "", false);
 
                 getFragmentManager().beginTransaction()
                         .replace(R.id.fragments_container, sf)
