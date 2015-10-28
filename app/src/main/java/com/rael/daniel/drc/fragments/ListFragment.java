@@ -32,6 +32,7 @@ public abstract class ListFragment<T> extends Fragment {
     ArrayAdapter<T> adapter;
     private List<T> list;
     ListFetcher<T> lFetcher;
+    protected boolean initialized = false;
     int layout_id, list_id, item_layout_id;
     protected boolean loadMoreOnScroll;
 
@@ -112,6 +113,7 @@ public abstract class ListFragment<T> extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initialize(false);
+        initialized = true;
     }
 
     // Refresh current fragment after logging in
@@ -124,8 +126,7 @@ public abstract class ListFragment<T> extends Fragment {
 
     protected void initialize(final boolean isUpdate){
 
-        if(getList().size()==0){
-
+        if(!initialized){
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected void onPreExecute() {
@@ -134,15 +135,16 @@ public abstract class ListFragment<T> extends Fragment {
                     if(getView() != null) { //Make sure the fragment is still visible
                         getView().findViewById(R.id.list_progress)
                                 .setVisibility(View.VISIBLE);
+                        lView.setVisibility(View.GONE);
                     }
                 }
 
                 @Override
                 protected Void doInBackground(Void... params) {
-                    // populate the main list
-                    getList().addAll(lFetcher.getItems());
                     // get any additional items (such as selfposts)
                     getAdditionalItems();
+                    // populate the main list
+                    getList().addAll(lFetcher.getItems());
                     return null;
                 }
 
@@ -153,6 +155,7 @@ public abstract class ListFragment<T> extends Fragment {
                     if(getView() != null) {
                         getView().findViewById(R.id.list_progress)
                                 .setVisibility(View.GONE);
+                        lView.setVisibility(View.VISIBLE);
                     }
                     if(isUpdate)
                         notifyChange();
@@ -191,13 +194,6 @@ public abstract class ListFragment<T> extends Fragment {
             public View getView(int position,
                                 View convertView,
                                 ViewGroup parent) {
-
-                //inflate list items
-                /*if(convertView == null)
-                    convertView=getActivity()
-                            .getLayoutInflater()
-                            .inflate(item_layout_id, null);*/
-
                 //Actual adapter implementation is delegated to superclass
                 convertView = fillItems(getList(), convertView, position);
                 setOnClick(getList(), lView, position);

@@ -37,6 +37,7 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
 
     @Override
     public void myRefresh() {
+        initialized = false;
         getList().clear();
         lFetcher = new SubredditFetcher(getActivity()
                 .getApplicationContext());

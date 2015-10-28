@@ -24,6 +24,7 @@ import com.rael.daniel.drc.reddit_api.GetMoreCommentsTask;
 import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
 import com.rael.daniel.drc.reddit_fetchers.CommentFetcher;
+import com.rael.daniel.drc.reddit_login.RedditLogin;
 import com.rael.daniel.drc.reddit_objects.RedditComment;
 import com.rael.daniel.drc.util.TimeSpan;
 
@@ -50,7 +51,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
     private final int VIEW_TYPE_MORE_COMMENTS_STUB = 3;
     private final int VIEW_TYPE_OP_LINK = 4;
 
-    private final int NUM_HEADERS = 2;
+    //private final int NUM_HEADERS = 2;
 
     public CommentsFragment(){
         super();
@@ -74,13 +75,14 @@ public class CommentsFragment extends ListFragment<RedditComment>{
         if(position == 1)
             return VIEW_TYPE_COMMENT_SEPARATOR;
 
-        if(getList().get(position - NUM_HEADERS).isMoreCommentsStub())
+        if(getList().get(position).isMoreCommentsStub())
             return VIEW_TYPE_MORE_COMMENTS_STUB;
         return VIEW_TYPE_REGULAR_COMMENT;
     }
 
     @Override
     public void myRefresh() {
+        initialized = false;
         getList().clear();
         lFetcher = new CommentFetcher(getActivity()
                 .getApplicationContext(), url, 0);
@@ -102,8 +104,10 @@ public class CommentsFragment extends ListFragment<RedditComment>{
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add("Upvote");
-        menu.add("Downvote");
+        if(new RedditLogin(getContext()).isLoggedIn()) {
+            menu.add("Upvote");
+            menu.add("Downvote");
+        }
     }
 
     //Upvote/downvote functionality
@@ -116,7 +120,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
             clickedComment = link;
             ((MainActivity)getActivity()).setStateChanged(true);
         }
-        else clickedComment = getList().get(info.position - NUM_HEADERS);
+        else clickedComment = getList().get(info.position);
         if(item.getTitle() == "Upvote") {
             new RedditAPICommon(getActivity().getApplicationContext())
                     .vote(clickedComment.getName(), 1);
@@ -149,6 +153,10 @@ public class CommentsFragment extends ListFragment<RedditComment>{
     //Get selfpost
     @Override
     void getAdditionalItems() {
+        //Set the first two main list elements to null so that the adapter knows
+        //that there are supposed to be two headers
+        getList().add(0, null);
+        getList().add(1, null);
         try {
             RedditConnectionManager conn =
                     new RedditConnectionManager(getContext());
@@ -184,7 +192,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
         setChildTextView(commentView, R.id.comment_user, comment.getUser());
         setChildTextView(commentView, R.id.comment_score, comment.getScore());
         Spanned spannedText = Html.fromHtml(comment.getText());
-        if (spannedText.length() > 2)
+        if (spannedText.length() > 2 && !spannedText.toString().equals("null"))
             setChildTextView(commentView, R.id.comment_text,
                     spannedText.subSequence(0, spannedText.length() - 2));
         else setChildTextView(commentView, R.id.comment_text, "");
@@ -202,14 +210,10 @@ public class CommentsFragment extends ListFragment<RedditComment>{
 
     }
 
-    @Override
-    void getAdditionalViews() {
-    }
-
     private void addRedditCommentStyle(ViewGroup outerLayout, ViewGroup innerLayout, int position) {
-        innerLayout.setBackgroundResource(getList().get(position - NUM_HEADERS).getDepth() % 2 == 0 ?
+        innerLayout.setBackgroundResource(getList().get(position).getDepth() % 2 == 0 ?
                         R.drawable.borders_white : R.drawable.borders_grey);
-        for (int i = 0; i < getList().get(position - NUM_HEADERS).getDepth(); i++) {
+        for (int i = 0; i < getList().get(position).getDepth(); i++) {
             View v = new View(getContext());
             v.setBackgroundResource(i % 2 == 0 ?
                     R.drawable.borders_white : R.drawable.borders_grey);
@@ -306,7 +310,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
             ViewGroup innerLayout = (ViewGroup)convertView.
                     findViewById(R.id.comment_inner_layout);
             addRedditCommentStyle(outerLayout, innerLayout, position);
-            fillCommentView(convertView, getList().get(position - NUM_HEADERS));
+            fillCommentView(convertView, getList().get(position));
             registerForContextMenu(lView);
             return convertView;
         }
@@ -320,10 +324,10 @@ public class CommentsFragment extends ListFragment<RedditComment>{
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
                 //Load more comments if user touches a "more comments" stub
-                if(position > 1 && comments.get(position - NUM_HEADERS)
+                if(position > 1 && comments.get(position)
                         .getUser().equals("more")) {
                     GetMoreCommentsTask tsk = new GetMoreCommentsTask(CommentsFragment.this,
-                            link.getName(), position - NUM_HEADERS);
+                            link.getName(), position);
                     tsk.execute((Void)null);
                 }
 

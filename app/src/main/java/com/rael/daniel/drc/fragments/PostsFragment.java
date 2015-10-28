@@ -16,11 +16,13 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.activities.SubmitActivity;
 import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 import com.rael.daniel.drc.reddit_fetchers.PostFetcher;
+import com.rael.daniel.drc.reddit_login.RedditLogin;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
 import com.rael.daniel.drc.util.Consts;
 
@@ -64,6 +66,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
 
     @Override
     public void myRefresh() {
+        initialized = false;
         getList().clear();
         lFetcher = new PostFetcher(getActivity()
                 .getApplicationContext(), createUrl());
@@ -105,6 +108,19 @@ public class PostsFragment extends ListFragment<RedditPost> {
             }
         });
 
+    }
+
+    //Sets visibility of submit menu item
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if(new RedditLogin(getActivity().getApplicationContext())
+                .isLoggedIn()) {
+            menu.findItem(R.id.submit_menu_item).setVisible(true);
+        }
+        else {
+            menu.findItem(R.id.submit_menu_item).setVisible(false);
+        }
     }
 
     @Override
@@ -229,6 +245,11 @@ public class PostsFragment extends ListFragment<RedditPost> {
         upvoteArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!new RedditLogin(getContext()).isLoggedIn()) {
+                    Toast.makeText(getContext(), "Need to be logged in to vote.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
                 new RedditAPICommon(getActivity().getApplicationContext())
                         .vote(getList().get(position).getName(), 1);
                 upvoteArrow.setColorFilter(ContextCompat
@@ -242,6 +263,11 @@ public class PostsFragment extends ListFragment<RedditPost> {
         downvoteArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!new RedditLogin(getContext()).isLoggedIn()) {
+                    Toast.makeText(getContext(), "Need to be logged in to vote.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
                 new RedditAPICommon(getActivity().getApplicationContext())
                         .vote(getList().get(position).getName(), -1);
                 downvoteArrow.setColorFilter(ContextCompat
