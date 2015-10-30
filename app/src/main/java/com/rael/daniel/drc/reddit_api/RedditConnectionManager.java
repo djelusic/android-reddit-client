@@ -15,9 +15,6 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
 * Used to connect to reddit and set appropriate headers for requests.
@@ -40,7 +37,7 @@ public class RedditConnectionManager {
             conn=(HttpURLConnection)new URL(url).openConnection();
             conn.setReadTimeout(30000); // Timeout at 30 seconds
             SharedPreferences pref = applicationContext
-                    .getSharedPreferences("com.rael.daniel.drc.SPREFS",
+                    .getSharedPreferences(Consts.SPREFS_LOGIN,
                             Context.MODE_PRIVATE);
             if(new RedditLogin(applicationContext).isLoggedIn()) {
                 String cookie = pref.getString("RedditCookie", null);

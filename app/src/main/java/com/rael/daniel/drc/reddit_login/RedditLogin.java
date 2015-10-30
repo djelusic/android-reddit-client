@@ -47,7 +47,7 @@ public class RedditLogin {
                         Consts.REDDIT_URL + "/api/me.json")).getJSONObject("data");
                 String modhash = data.getString("modhash");
                 SharedPreferences.Editor edit = applicationContext
-                        .getSharedPreferences(Consts.SPREFS_NAME,
+                        .getSharedPreferences(Consts.SPREFS_LOGIN,
                                 Context.MODE_PRIVATE).edit();
                 edit.putString("Modhash", modhash).apply();
                 return modhash;
@@ -82,10 +82,11 @@ public class RedditLogin {
             Log.d("Success", cookie);
             redditCookie = cookie;
             SharedPreferences.Editor edit = applicationContext
-                    .getSharedPreferences(Consts.SPREFS_NAME,
+                    .getSharedPreferences(Consts.SPREFS_LOGIN,
                             Context.MODE_PRIVATE).edit();
             edit.putString("RedditCookie", cookie).apply();
             edit.putBoolean("isLoggedIn", true).apply();
+            edit.putString("currentUser", username);
             getModhash();
             return true;
         }
@@ -95,13 +96,19 @@ public class RedditLogin {
     //Sets the login flag to false
     public void logout() {
         SharedPreferences.Editor edit = applicationContext
-                .getSharedPreferences(Consts.SPREFS_NAME,
+                .getSharedPreferences(Consts.SPREFS_LOGIN,
                         Context.MODE_PRIVATE).edit();
         edit.putBoolean("isLoggedIn", false).apply();
+        edit.putString("currentUser", null);
     }
 
     public boolean isLoggedIn() {
-        return applicationContext.getSharedPreferences(Consts.SPREFS_NAME,
+        return applicationContext.getSharedPreferences(Consts.SPREFS_LOGIN,
                 Context.MODE_PRIVATE).getBoolean("isLoggedIn", false);
+    }
+
+    public String getCurrentUser() {
+        return applicationContext.getSharedPreferences(Consts.SPREFS_LOGIN,
+                Context.MODE_PRIVATE).getString("currentUser", null);
     }
 }

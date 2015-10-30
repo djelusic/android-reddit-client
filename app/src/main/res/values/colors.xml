@@ -7,4 +7,5 @@
     <color name="downvoteBlue">#003366</color>
     <color name="moreCommentsBlue">#0000EE</color>
     <color name="commentGrey">#F2F2F2</color>
+    <color name="visited">#551A8B</color>
 </resources>

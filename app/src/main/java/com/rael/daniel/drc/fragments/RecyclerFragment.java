@@ -21,6 +21,7 @@ import com.rael.daniel.drc.activities.LoginActivity;
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.misc.RedditRecyclerAdapter;
 import com.rael.daniel.drc.reddit_fetchers.ListFetcher;
+import com.rael.daniel.drc.util.Consts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +92,7 @@ public abstract class RecyclerFragment<T> extends Fragment {
             case R.id.logout:
                 SharedPreferences.Editor edit = getActivity()
                         .getApplicationContext()
-                        .getSharedPreferences("com.rael.daniel.drc.SPREFS",
+                        .getSharedPreferences(Consts.SPREFS_LOGIN,
                                 Context.MODE_PRIVATE).edit();
                 edit.remove("RedditCookie").commit();
                 myRefresh();

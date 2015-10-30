@@ -3,6 +3,7 @@ package com.rael.daniel.drc.fragments;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.Image;
 import android.support.v4.app.Fragment;
@@ -175,8 +176,8 @@ public class PostsFragment extends ListFragment<RedditPost> {
                     .getLayoutInflater()
                     .inflate(item_layout_id, null);
 
-        ((TextView)convertView.findViewById(R.id.post_title))
-                .setText(posts.get(position).getTitle());
+        TextView title = (TextView)convertView.findViewById(R.id.post_title);
+        title.setText(posts.get(position).getTitle());
         ((TextView)convertView.findViewById(R.id.post_details))
                 .setText("submitted " + posts.get(position).getDate() + " ago by "
                 + posts.get(position).getAuthor() + " (" + posts.get(position).getDomain() + ")");
@@ -184,6 +185,18 @@ public class PostsFragment extends ListFragment<RedditPost> {
                 .setText(posts.get(position).getNumComments() + " comments");
         ((TextView)convertView.findViewById(R.id.post_score))
                 .setText(String.valueOf(posts.get(position).getPoints()));
+
+        //Change color if the post was previously visited
+        RedditLogin rl = new RedditLogin(getContext());
+        if(rl.isLoggedIn()) {
+            SharedPreferences sprefs = getContext()
+                    .getSharedPreferences(Consts.SPREFS_READ_POSTS + rl.getCurrentUser(),
+                            Context.MODE_PRIVATE);
+            if(sprefs.getString(posts.get(position).getName(), "false").equals("true"))
+                title.setTextColor(ContextCompat.getColor(getContext(), R.color.visited));
+            else //Get default color in case the view is recycled, don't really know a better way to do this
+                title.setTextColor(new TextView(getContext()).getTextColors().getDefaultColor());
+        }
 
         final TextView score = (TextView)convertView.findViewById(R.id.post_score);
         final ImageView upvoteArrow = (ImageView)convertView.findViewById(R.id.upvote_arrow);
@@ -282,11 +295,20 @@ public class PostsFragment extends ListFragment<RedditPost> {
     }
 
     @Override
-    void setOnClick(final List<RedditPost> posts, ListView lView, int position) {
+    void setOnClick(final List<RedditPost> posts, final ListView lView, int position) {
         lView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
+                RedditLogin rl = new RedditLogin(getContext());
+                if(rl.isLoggedIn()) {
+                    SharedPreferences.Editor edit = getContext()
+                            .getSharedPreferences(Consts.SPREFS_READ_POSTS + rl.getCurrentUser(),
+                                    Context.MODE_PRIVATE).edit();
+                    edit.putString(posts.get(position).getName(), "true").apply();
+                }
+
+
                 String postUrl = Consts.REDDIT_URL + posts.get(position).getPermalink() + ".json";
                 Fragment pf = CommentsFragment.newInstance(getActivity()
                         .getApplicationContext(), postUrl);

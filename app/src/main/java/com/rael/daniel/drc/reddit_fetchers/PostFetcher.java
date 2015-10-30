@@ -54,6 +54,7 @@ public class PostFetcher extends ListFetcher<RedditPost> {
                 post.setId(cur.optString("id"));
                 post.setName(cur.optString("name"));
                 post.setLikes(cur.optString("likes"));
+                post.setClicked(cur.optString("clicked"));
                 post.setDate(TimeSpan
                         .calculateTimeSpan(new BigDecimal(cur.getString("created_utc"))
                                 .longValue(), System.currentTimeMillis() / 1000l));

@@ -16,6 +16,7 @@ public class RedditPost {
     private String name;
     private String likes;
     private String date;
+    private String clicked;
 
     public boolean isUpvoted() {
         return likes.equals("true");
@@ -119,5 +120,13 @@ public class RedditPost {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getClicked() {
+        return clicked;
+    }
+
+    public void setClicked(String clicked) {
+        this.clicked = clicked;
     }
 }
