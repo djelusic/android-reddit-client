@@ -54,12 +54,6 @@ public class RedditAPICommon {
         }
     }
 
-    public void vote(String id, int dir) {
-        VoteTask tsk = new VoteTask("id=" + id + "&dir="
-                + String.valueOf(dir));
-        tsk.execute();
-    }
-
     private class SubmitTask extends AsyncTask<Void, Void, String> {
         private final String body;
         private final SubmitActivity sa;
@@ -111,6 +105,38 @@ public class RedditAPICommon {
         }
     }
 
+    private class ReplyTask extends AsyncTask<Void, Void, Boolean> {
+        String body;
+
+        public ReplyTask(String body) {
+            this.body = body;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            RedditLogin rl = new RedditLogin(applicationContext);
+            if(rl.isLoggedIn()) {
+                RedditConnectionManager rcm = new RedditConnectionManager(applicationContext);
+                if(rcm.postRequest(rcm.getConnection(Consts.REDDIT_URL + "/api/comment"),
+                        body) != null)
+                    return true;
+                else return false;
+            }
+            else return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+        }
+    }
+
+    public void vote(String id, int dir) {
+        VoteTask tsk = new VoteTask("id=" + id + "&dir="
+                + String.valueOf(dir));
+        tsk.execute();
+    }
+
     public void submit(String sr, String kind, SubmitActivity sa) {
         View captchaImg = sa.findViewById(R.id.captcha_img);
         String title = ((EditText)sa.findViewById(R.id.submit_title))
@@ -133,5 +159,11 @@ public class RedditAPICommon {
             new SubmitTask("kind=" + kind + "&sr=" + sr + "&title="
                     + title + "&text=" + text + "&api_type=json"
                     + captchaHeader, sa).execute((Void)null);
+    }
+
+    public void reply(String parentId, String replyText) {
+        ReplyTask tsk = new ReplyTask("thing_id=" + parentId +
+                "&text=" + replyText + "&api_type=json");
+        tsk.execute((Void)null);
     }
 }

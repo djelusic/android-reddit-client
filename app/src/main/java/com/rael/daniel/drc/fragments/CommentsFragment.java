@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.rael.daniel.drc.activities.MainActivity;
 import com.rael.daniel.drc.R;
+import com.rael.daniel.drc.dialogs.ReplyDialog;
 import com.rael.daniel.drc.reddit_api.GetMoreCommentsTask;
 import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
@@ -107,6 +108,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
         if(new RedditLogin(getContext()).isLoggedIn()) {
             menu.add("Upvote");
             menu.add("Downvote");
+            menu.add("Reply");
         }
     }
 
@@ -146,6 +148,12 @@ public class CommentsFragment extends ListFragment<RedditComment>{
                     .getColor(getContext(), R.color.downvoteBlue));
             ((TextView)scoreView).setText(String.valueOf(Integer
                     .valueOf(clickedComment.getScore()) - 1));
+        }
+        else if(item.getTitle() == "Reply") {
+            Bundle params = new Bundle();
+            params.putString("parent_id", clickedComment.getName());
+            ReplyDialog rd = new ReplyDialog(getActivity(), params);
+            rd.show();
         }
         return true;
     }
@@ -258,7 +266,6 @@ public class CommentsFragment extends ListFragment<RedditComment>{
 
     //Renders comments with alternating white/grey borders to improve visibility
     View fillItems(List<RedditComment> comments, View convertView, int position) {
-
         if(mGetItemViewType(position) == VIEW_TYPE_OP_COMMENT && link != null) {
             if (convertView == null)
                 convertView = getActivity()
@@ -282,7 +289,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
 
         //Handle "more comments" stubs
         if(mGetItemViewType(position) == VIEW_TYPE_MORE_COMMENTS_STUB) {
-            //Can't recycle view here because it will mess up the indentation
+            //Can't recycle the view here because it will mess up the indentation
             //TODO: find a way to do it :)
             convertView = getActivity()
                     .getLayoutInflater()
@@ -300,7 +307,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
 
         //Regular comments
         if(position > 1) {
-            //Can't recycle view here because it will mess up the indentation
+            //Can't recycle the view here because it will mess up the indentation
             //TODO: find a way to do it :)
             convertView = getActivity()
                     .getLayoutInflater()
@@ -311,7 +318,6 @@ public class CommentsFragment extends ListFragment<RedditComment>{
                     findViewById(R.id.comment_inner_layout);
             addRedditCommentStyle(outerLayout, innerLayout, position);
             fillCommentView(convertView, getList().get(position));
-            registerForContextMenu(lView);
             return convertView;
         }
         return convertView;

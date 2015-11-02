@@ -186,7 +186,9 @@ public class PostsFragment extends ListFragment<RedditPost> {
         ((TextView)convertView.findViewById(R.id.post_score))
                 .setText(String.valueOf(posts.get(position).getPoints()));
 
-        //Change color if the post was previously visited
+        //Change color if the post was previously visited.
+        //Note that reddit doesn't actually save this information so there is no way to sync this
+        //across devices/installs.
         RedditLogin rl = new RedditLogin(getContext());
         if(rl.isLoggedIn()) {
             SharedPreferences sprefs = getContext()

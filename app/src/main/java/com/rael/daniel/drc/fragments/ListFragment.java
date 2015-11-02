@@ -210,6 +210,7 @@ public abstract class ListFragment<T> extends Fragment {
                 return mGetItemViewType(position);
             }
         };
+        registerForContextMenu(lView);
         lView.setAdapter(adapter);
         if(loadMoreOnScroll) {
             lView.setOnScrollListener(new AbsListView.OnScrollListener() {

@@ -37,4 +37,6 @@
     <string name="all">/r/all</string>
     <string name="options">Options</string>
     <string name="loading">Loading...</string>
+    <string name="reply_button">Reply</string>
+    <string name="cancel_button">Cancel</string>
 </resources>
