@@ -19,7 +19,6 @@ import java.util.List;
 * Gets all the comments from a given post
 * */
 public class CommentFetcher extends ListFetcher<RedditComment> {
-    private String url;
     private int startingDepth;
 
     public CommentFetcher(Context applicationContext, int startingDepth) {
@@ -36,10 +35,9 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
 
     public List<RedditComment> getItems() {
         List<RedditComment> comments = new ArrayList<>();
-
         RedditConnectionManager conn =
                 new RedditConnectionManager(applicationContext);
-        String rawData = conn.readContents(url);
+        rawData = conn.readContents(url);
         return getItemsFromString(rawData);
     }
 

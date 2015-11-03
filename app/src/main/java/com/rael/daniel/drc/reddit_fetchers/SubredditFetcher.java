@@ -22,8 +22,6 @@ import java.util.StringTokenizer;
  */
 public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
 
-    String url;
-
     public SubredditFetcher(Context applicationContext) {
         super(applicationContext);
         if(new RedditLogin(applicationContext).isLoggedIn())
@@ -33,11 +31,10 @@ public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
     }
 
     public List<RedditSubreddit> getItems() {
+        List<RedditSubreddit> subredditList = new ArrayList<>();
         RedditConnectionManager conn =
                 new RedditConnectionManager(applicationContext);
-        String rawData = conn.readContents(url);
-        List<RedditSubreddit> subredditList = new ArrayList<>();
-
+        rawData = conn.readContents(url);
         try {
             JSONObject data=new JSONObject(rawData)
                     .getJSONObject("data");

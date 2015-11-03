@@ -11,9 +11,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.rael.daniel.drc.activities.MainActivity;
 import com.rael.daniel.drc.activities.LoginActivity;
@@ -28,15 +30,17 @@ import java.util.List;
  * Generic fragment for displaying content on Reddit
 * */
 public abstract class ListFragment<T> extends Fragment {
-    ListView lView;
-    ArrayAdapter<T> adapter;
-    private List<T> list;
-    ListFetcher<T> lFetcher;
+    protected ListView lView;
+    protected ArrayAdapter<T> adapter;
+    protected List<T> list;
+    protected ListFetcher<T> lFetcher;
     protected boolean initialized = false;
-    int layout_id, list_id, item_layout_id;
+    protected int layout_id, list_id, item_layout_id;
     protected boolean loadMoreOnScroll;
+    protected View contentView;
 
     public ListFragment(){
+        contentView = null;
         setList(new ArrayList<T>());
         setHasOptionsMenu(true);
     }
@@ -48,11 +52,13 @@ public abstract class ListFragment<T> extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate basic layout
-        View v=inflater.inflate(layout_id
+        contentView = inflater.inflate(layout_id
                 , container
                 , false);
-        lView =(ListView)v.findViewById(list_id);
-        return v;
+        lView =(ListView)contentView.findViewById(list_id);
+        initialize(false);
+        initialized = true;
+        return contentView;
     }
 
     @Override
@@ -112,9 +118,9 @@ public abstract class ListFragment<T> extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initialize(false);
-        initialized = true;
     }
+
+
 
     // Refresh current fragment after logging in
     @Override
@@ -127,33 +133,46 @@ public abstract class ListFragment<T> extends Fragment {
     protected void initialize(final boolean isUpdate){
 
         if(!initialized){
-            new AsyncTask<Void, Void, Void>() {
+            new AsyncTask<Void, Void, String>() {
                 @Override
                 protected void onPreExecute() {
                     super.onPreExecute();
                     // Show progress bar
-                    if(getView() != null) { //Make sure the fragment is still visible
-                        getView().findViewById(R.id.list_progress)
+                    if(contentView != null) { //Make sure the fragment is still visible
+                        contentView.findViewById(R.id.list_progress)
                                 .setVisibility(View.VISIBLE);
+                        contentView.findViewById(R.id.errors)
+                                .setVisibility(View.GONE);
                         lView.setVisibility(View.GONE);
                     }
                 }
 
                 @Override
-                protected Void doInBackground(Void... params) {
+                protected String doInBackground(Void... params) {
                     // get any additional items (such as selfposts)
                     getAdditionalItems();
                     // populate the main list
                     getList().addAll(lFetcher.getItems());
-                    return null;
+                    return lFetcher.showErrors();
                 }
 
                 @Override
-                protected void onPostExecute(Void aVoid) {
-                    super.onPostExecute(aVoid);
+                protected void onPostExecute(String result) {
+                    super.onPostExecute(result);
+                    if(result != null && contentView != null) {
+                        TextView errors = (TextView)contentView
+                                .findViewById(R.id.errors);
+                        errors.setText(lFetcher.showErrors());
+                        errors.setVisibility(View.VISIBLE);
+                        contentView.findViewById(R.id.list_progress)
+                                .setVisibility(View.GONE);
+                        return;
+                    }
                     // Hide progress bar
-                    if(getView() != null) {
-                        getView().findViewById(R.id.list_progress)
+                    else if(contentView != null) {
+                        contentView.findViewById(R.id.errors)
+                                .setVisibility(View.GONE);
+                        contentView.findViewById(R.id.list_progress)
                                 .setVisibility(View.GONE);
                         lView.setVisibility(View.VISIBLE);
                     }

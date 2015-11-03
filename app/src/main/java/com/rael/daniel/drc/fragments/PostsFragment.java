@@ -266,7 +266,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
                     return;
                 }
                 new RedditAPICommon(getActivity().getApplicationContext())
-                        .vote(getList().get(position).getName(), 1);
+                        .vote(getList().get(position).getName(), 1, PostsFragment.this);
                 upvoteArrow.setColorFilter(ContextCompat
                         .getColor(getContext(), R.color.upvoteOrange));
                 downvoteArrow.setColorFilter(ContextCompat
@@ -284,7 +284,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
                     return;
                 }
                 new RedditAPICommon(getActivity().getApplicationContext())
-                        .vote(getList().get(position).getName(), -1);
+                        .vote(getList().get(position).getName(), -1, PostsFragment.this);
                 downvoteArrow.setColorFilter(ContextCompat
                         .getColor(getContext(), R.color.downvoteBlue));
                 upvoteArrow.setColorFilter(ContextCompat

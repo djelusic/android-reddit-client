@@ -125,7 +125,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
         else clickedComment = getList().get(info.position);
         if(item.getTitle() == "Upvote") {
             new RedditAPICommon(getActivity().getApplicationContext())
-                    .vote(clickedComment.getName(), 1);
+                    .vote(clickedComment.getName(), 1, this);
             //Change color of score to orange after upvoting
             //TODO: integrate this into VoteTask
             View scoreView = lView.getChildAt(info.position -
@@ -138,7 +138,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
         }
         else if(item.getTitle() == "Downvote") {
             new RedditAPICommon(getActivity().getApplicationContext())
-                    .vote(clickedComment.getName(), -1);
+                    .vote(clickedComment.getName(), -1, this);
             //Change color of score to blue after downvoting
             //TODO: integrate this into VoteTask
             View scoreView = lView.getChildAt(info.position -

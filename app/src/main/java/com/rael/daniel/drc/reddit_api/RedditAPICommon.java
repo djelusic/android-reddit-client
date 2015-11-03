@@ -6,9 +6,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.activities.SubmitActivity;
+import com.rael.daniel.drc.fragments.ListFragment;
 import com.rael.daniel.drc.reddit_login.RedditLogin;
 import com.rael.daniel.drc.util.Consts;
 import com.rael.daniel.drc.util.DownloadImageTask;
@@ -26,31 +28,31 @@ public class RedditAPICommon {
         this.applicationContext = applicationContext;
     }
 
-    private class VoteTask extends AsyncTask<Void, Void, Boolean> {
-        private final String body;
+    private class VoteTask extends AsyncTask<Void, Void, String> {
+        private String body;
+        private ListFragment fragment;
 
-        VoteTask(String body) {
+        VoteTask(String body, ListFragment fragment) {
             this.body = body;
+            this.fragment = fragment;
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
             RedditLogin rl = new RedditLogin(applicationContext);
             if(rl.isLoggedIn()) {
                 RedditConnectionManager rcm = new RedditConnectionManager(applicationContext);
-                if(rcm.postRequest(rcm.getConnection(Consts.REDDIT_URL + "/api/vote"),
-                        body) != null)
-                    return true;
-                else return false;
+                return rcm.postRequest(rcm.getConnection(Consts.REDDIT_URL + "/api/vote"), body);
             }
-            else return false;
+            else return null;
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
+        protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if(result)
-                Log.d("Vote", "success");
+            if(result.startsWith("HTTP error"))
+                Toast.makeText(applicationContext, result +
+                        ". Reddit is most likely down.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -68,11 +70,8 @@ public class RedditAPICommon {
             RedditLogin rl = new RedditLogin(applicationContext);
             if(rl.isLoggedIn()) {
                 RedditConnectionManager rcm = new RedditConnectionManager(applicationContext);
-                String response = rcm.postRequest(rcm.getConnection(Consts.REDDIT_URL + "/api/submit"),
+                return rcm.postRequest(rcm.getConnection(Consts.REDDIT_URL + "/api/submit"),
                         body);
-                if(response != null)
-                    return response;
-                else return null;
             }
             else return null;
         }
@@ -80,8 +79,9 @@ public class RedditAPICommon {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if(result == null)
-                Log.d("Submit", "Submit failed");
+            if(result.startsWith("HTTP error"))
+                Toast.makeText(applicationContext, result +
+                        ". Reddit is most likely down.", Toast.LENGTH_LONG).show();
             else if(result.contains("BAD_CAPTCHA")) {
                 Log.d("Submit", "Need captcha");
                 try {
@@ -105,7 +105,7 @@ public class RedditAPICommon {
         }
     }
 
-    private class ReplyTask extends AsyncTask<Void, Void, Boolean> {
+    private class ReplyTask extends AsyncTask<Void, Void, String> {
         String body;
 
         public ReplyTask(String body) {
@@ -113,27 +113,28 @@ public class RedditAPICommon {
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
             RedditLogin rl = new RedditLogin(applicationContext);
             if(rl.isLoggedIn()) {
                 RedditConnectionManager rcm = new RedditConnectionManager(applicationContext);
-                if(rcm.postRequest(rcm.getConnection(Consts.REDDIT_URL + "/api/comment"),
-                        body) != null)
-                    return true;
-                else return false;
+                return rcm.postRequest(rcm.getConnection(Consts.REDDIT_URL
+                                + "/api/comment"), body);
             }
-            else return false;
+            else return null;
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if(result.startsWith("HTTP error"))
+                Toast.makeText(applicationContext, result +
+                        ". Reddit is most likely down.", Toast.LENGTH_LONG).show();
         }
     }
 
-    public void vote(String id, int dir) {
+    public void vote(String id, int dir, ListFragment fragment) {
         VoteTask tsk = new VoteTask("id=" + id + "&dir="
-                + String.valueOf(dir));
+                + String.valueOf(dir), fragment);
         tsk.execute();
     }
 

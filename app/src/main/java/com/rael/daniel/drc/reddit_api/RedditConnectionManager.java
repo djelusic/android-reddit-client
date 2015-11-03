@@ -2,6 +2,8 @@ package com.rael.daniel.drc.reddit_api;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.rael.daniel.drc.reddit_login.RedditLogin;
@@ -25,6 +27,34 @@ public class RedditConnectionManager {
 
     public RedditConnectionManager(Context applicationContext) {
         this.applicationContext = applicationContext;
+    }
+
+    public static boolean isConnected(Context context) {
+        ConnectivityManager cm = (ConnectivityManager)context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isConnected()) {
+            try {
+                URL url = new URL("http://www.google.com/");
+                HttpURLConnection urlc = (HttpURLConnection)url.openConnection();
+                urlc.setRequestProperty("User-Agent", "test");
+                urlc.setRequestProperty("Connection", "close");
+                urlc.setConnectTimeout(1000); // mTimeout is in seconds
+                urlc.connect();
+                if (urlc.getResponseCode() == 200) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (IOException e) {
+                Log.i("warning", "Error checking internet connection", e);
+                return false;
+            }
+        }
+
+        return false;
+
     }
 
     /*
@@ -63,6 +93,10 @@ public class RedditConnectionManager {
         HttpURLConnection conn=getConnection(url);
         if(conn==null) return null;
         try{
+            if(conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                Log.d("HTTP error", String.valueOf(conn.getResponseCode()));
+                return "HTTP error " + conn.getResponseCode();
+            }
             StringBuilder sb=new StringBuilder(8192);
             String tmp;
             BufferedReader br=new BufferedReader(
@@ -76,7 +110,7 @@ public class RedditConnectionManager {
             return sb.toString();
         }catch(IOException e){
             Log.d("READ FAILED", e.toString());
-            return null;
+            return "READ FAILED: " + e.toString();
         }
     }
 
@@ -92,6 +126,10 @@ public class RedditConnectionManager {
             pw.close();
 
             try{
+                if(con.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    Log.d("HTTP error", String.valueOf(con.getResponseCode()));
+                    return "HTTP error " + con.getResponseCode();
+                }
                 StringBuilder sb=new StringBuilder(8192);
                 String tmp;
                 BufferedReader br=new BufferedReader(
@@ -106,7 +144,7 @@ public class RedditConnectionManager {
                 return sb.toString();
             }catch(IOException e){
                 Log.d("READ FAILED", e.toString());
-                return null;
+                return "READ FAILED: " + e.toString();
             }
 
         }catch(IOException e){

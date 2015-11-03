@@ -19,8 +19,6 @@ import java.util.List;
  */
 public class PostFetcher extends ListFetcher<RedditPost> {
 
-    String url;
-
     public PostFetcher(Context applicationContext, String url) {
         super(applicationContext);
         this.url = url + "/.json";
@@ -28,11 +26,10 @@ public class PostFetcher extends ListFetcher<RedditPost> {
     }
 
     public List<RedditPost> getItems() {
+        List<RedditPost> postList = new ArrayList<>();
         RedditConnectionManager conn =
                 new RedditConnectionManager(applicationContext);
-        String rawData = conn.readContents(url);
-        List<RedditPost> postList = new ArrayList<>();
-
+        rawData = conn.readContents(url);
         try {
             JSONObject data=new JSONObject(rawData)
                     .getJSONObject("data");

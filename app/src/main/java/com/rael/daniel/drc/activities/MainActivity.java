@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.Window;
 
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.fragments.ListFragment;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
                 toolbar, R.string.drawer_open,  R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);
-        addFragment();
+        addFragment(savedInstanceState);
 
         //Set a backstack listener to correctly change fragment names
         getSupportFragmentManager().addOnBackStackChangedListener(
@@ -124,13 +125,15 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    void addFragment(){
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragments_container
-                        , SubredditsFragment.newInstance(getApplicationContext()))
-                .addToBackStack("Subreddits") //The default fragment
-                .commit();
+    void addFragment(Bundle savedInstanceState){
+        if(savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.fragments_container
+                            , SubredditsFragment.newInstance(getApplicationContext()))
+                    .addToBackStack("Subreddits") //The default fragment
+                    .commit();
+        }
     }
 
     public boolean isStateChanged() {
