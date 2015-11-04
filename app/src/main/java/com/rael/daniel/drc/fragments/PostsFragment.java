@@ -1,11 +1,8 @@
 package com.rael.daniel.drc.fragments;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.media.Image;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SearchView;
@@ -26,8 +23,14 @@ import com.rael.daniel.drc.reddit_fetchers.PostFetcher;
 import com.rael.daniel.drc.reddit_login.RedditLogin;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
 import com.rael.daniel.drc.util.Consts;
+import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import imgur.ImgurGalleryFetcher;
+import imgur.ImgurImage;
+import imgur.PicassoImgurThumbnailTask;
 
 /**
  * Fragment that displays fetched posts
@@ -234,10 +237,40 @@ public class PostsFragment extends ListFragment<RedditPost> {
         if(posts.get(position).getDomain().startsWith("self")) {
             convertView.findViewById(R.id.browser_image)
                     .setVisibility(View.GONE);
+            convertView.findViewById(R.id.link_thumbnail)
+                    .setVisibility(View.GONE);
         }
-        else { //Open link in a WebView fragment
+        else if(!posts.get(position).getThumbnailUrl().equals("")) {
+            //image link, load thumbnail
+            convertView.findViewById(R.id.browser_image)
+                    .setVisibility(View.GONE);
+            convertView.findViewById(R.id.link_thumbnail)
+                    .setVisibility(View.VISIBLE);
+            Picasso.with(getContext()).load(posts.get(position)
+                    .getThumbnailUrl()).fit().into((ImageView) convertView
+                    .findViewById(R.id.link_thumbnail));
+            convertView.findViewById(R.id.link_thumbnail)
+                    .setOnClickListener(
+                            new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    ImageFragment imf =
+                                            (ImageFragment)ImageFragment.newInstance();
+                                    Picasso.with(getContext()).load(posts.get(position).getUrl())
+                                            .into(imf.getImageView());
+                                    getFragmentManager().beginTransaction()
+                                            .replace(R.id.fragments_container, imf)
+                                            .addToBackStack("Image")
+                                            .commit();
+                                }
+                            }
+                    );
+        }
+        else {
             convertView.findViewById(R.id.browser_image)
                     .setVisibility(View.VISIBLE);
+            convertView.findViewById(R.id.link_thumbnail)
+                    .setVisibility(View.GONE);
             convertView.findViewById(R.id.browser_image)
                     .setOnClickListener(
                             new View.OnClickListener() {

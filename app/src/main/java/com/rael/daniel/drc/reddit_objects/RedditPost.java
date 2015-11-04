@@ -17,6 +17,7 @@ public class RedditPost {
     private String likes;
     private String date;
     private String clicked;
+    private String thumbnailUrl;
 
     public boolean isUpvoted() {
         return likes.equals("true");
@@ -128,5 +129,13 @@ public class RedditPost {
 
     public void setClicked(String clicked) {
         this.clicked = clicked;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 }

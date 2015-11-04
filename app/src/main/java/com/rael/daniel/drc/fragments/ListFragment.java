@@ -11,11 +11,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rael.daniel.drc.activities.MainActivity;
 import com.rael.daniel.drc.activities.LoginActivity;
@@ -149,20 +149,21 @@ public abstract class ListFragment<T> extends Fragment {
 
                 @Override
                 protected String doInBackground(Void... params) {
-                    // get any additional items (such as selfposts)
-                    getAdditionalItems();
                     // populate the main list
                     getList().addAll(lFetcher.getItems());
-                    return lFetcher.showErrors();
+                    // get any additional items (such as selfposts)
+                    getAdditionalItems();
+                    return lFetcher.getErrors();
                 }
 
                 @Override
                 protected void onPostExecute(String result) {
                     super.onPostExecute(result);
+                    //Handle potential errors returned by the API
                     if(result != null && contentView != null) {
                         TextView errors = (TextView)contentView
                                 .findViewById(R.id.errors);
-                        errors.setText(lFetcher.showErrors());
+                        errors.setText(lFetcher.getErrors());
                         errors.setVisibility(View.VISIBLE);
                         contentView.findViewById(R.id.list_progress)
                                 .setVisibility(View.GONE);
@@ -244,7 +245,7 @@ public abstract class ListFragment<T> extends Fragment {
                     int lastIndex = firstVisibleItem + visibleItemCount;
                     if (totalItemCount >0 && lastIndex == getList()
                             .size() && lFetcher.hasMoreItems() && !isLoading) {
-                        new AsyncTask<Void, Void, Void>() {
+                        new AsyncTask<Void, Void, String>() {
                             View progressBar;
                             @Override
                             protected void onPreExecute() {
@@ -256,14 +257,18 @@ public abstract class ListFragment<T> extends Fragment {
                             }
 
                             @Override
-                            protected Void doInBackground(Void... params) {
+                            protected String doInBackground(Void... params) {
                                 list.addAll(lFetcher.getMoreItems());
-                                return null;
+                                return lFetcher.getErrors();
                             }
 
                             @Override
-                            protected void onPostExecute(Void aVoid) {
-                                super.onPostExecute(aVoid);
+                            protected void onPostExecute(String result) {
+                                super.onPostExecute(result);
+                                if(result != null) {
+                                    //TODO this doesn't work properly
+                                    Toast.makeText(getContext(), result, Toast.LENGTH_LONG).show();
+                                }
                                 notifyChange();
                                 isLoading = false;
                                 lView.removeFooterView(progressBar);
@@ -276,7 +281,6 @@ public abstract class ListFragment<T> extends Fragment {
     }
 
     void getAdditionalItems() {} //Implement in superclass
-    void getAdditionalViews() {} //Implement in superclass
     abstract View fillItems(List<T> list, View convertView, int position);
     abstract void setOnClick(List<T> list, ListView lView, int position);
 

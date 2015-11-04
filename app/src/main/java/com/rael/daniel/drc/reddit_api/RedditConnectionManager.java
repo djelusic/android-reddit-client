@@ -58,7 +58,7 @@ public class RedditConnectionManager {
     }
 
     /*
-        * Connect to URL via HTTP
+        * Connect to Reddit via HTTP
         * */
     public HttpURLConnection getConnection(String url){
         System.out.println("URL: "+url);

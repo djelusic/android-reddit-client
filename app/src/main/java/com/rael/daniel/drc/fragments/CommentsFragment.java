@@ -163,6 +163,7 @@ public class CommentsFragment extends ListFragment<RedditComment>{
     void getAdditionalItems() {
         //Set the first two main list elements to null so that the adapter knows
         //that there are supposed to be two headers
+        //TODO: make it less hacky
         getList().add(0, null);
         getList().add(1, null);
         try {

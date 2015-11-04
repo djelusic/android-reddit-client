@@ -19,14 +19,18 @@ public abstract class ListFetcher<T> {
         this.applicationContext = applicationContext;
     }
 
-    public String showErrors() {
+    public String getErrors() {
         if(!RedditConnectionManager.isConnected(applicationContext)) {
             return "No internet connection detected";
         }
-        else if(rawData.startsWith("HTTP error") || rawData.startsWith("READ FAILED"))
+        if(rawData.startsWith("HTTP error") || rawData.startsWith("READ FAILED")) {
             /*Toast.makeText(applicationContext, rawData, Toast.LENGTH_LONG).show();*/
             return rawData;
-        else return null;
+        }
+        if(rawData.contains("USER_REQUIRED")) { //TODO: note, potentially unsafe
+            return "Login has expired. Please log out and log back in.";
+        }
+        return null;
     }
 
     public boolean hasMoreItems() { return !after.equals("null"); }

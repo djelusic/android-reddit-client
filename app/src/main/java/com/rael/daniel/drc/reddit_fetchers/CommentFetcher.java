@@ -88,16 +88,16 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
                     continue;
                 }
                 currentComment.setText(Html.fromHtml(commentData
-                        .getString("body_html")).toString());
-                currentComment.setUser(commentData.getString("author"));
-                currentComment.setScore(commentData.getString("score"));
+                        .optString("body_html")).toString());
+                currentComment.setUser(commentData.optString("author"));
+                currentComment.setScore(commentData.optString("score"));
                 currentComment.setDate(TimeSpan
-                        .calculateTimeSpan(new BigDecimal(commentData.getString("created_utc"))
+                        .calculateTimeSpan(new BigDecimal(commentData.optString("created_utc"))
                                 .longValue(), System.currentTimeMillis() / 1000l));
-                currentComment.setId(commentData.getString("id"));
-                currentComment.setName(commentData.getString("name"));
-                currentComment.setLikes(commentData.getString("likes"));
-                currentComment.setTitle(commentData.getString("title"));
+                currentComment.setId(commentData.optString("id"));
+                currentComment.setName(commentData.optString("name"));
+                currentComment.setLikes(commentData.optString("likes"));
+                currentComment.setTitle(commentData.optString("title"));
 
                 moreComments.add(currentComment);
             }

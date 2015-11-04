@@ -4,7 +4,7 @@
     <item android:id="@+id/action_search"
         android:title="@string/manual_search_subreddit"
         android:icon="@drawable/ic_search_white_24dp"
-        yourapp:showAsAction="always"
+        yourapp:showAsAction="ifRoom|collapseActionView"
         yourapp:actionViewClass="android.support.v7.widget.SearchView" />
 
     <item android:id="@+id/login"

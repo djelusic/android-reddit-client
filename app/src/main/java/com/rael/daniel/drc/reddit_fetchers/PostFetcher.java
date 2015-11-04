@@ -14,6 +14,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import imgur.ImgurGalleryFetcher;
+import imgur.ImgurImage;
+
 /**
  * Gets all posts in a given subreddit
  */
@@ -55,6 +58,31 @@ public class PostFetcher extends ListFetcher<RedditPost> {
                 post.setDate(TimeSpan
                         .calculateTimeSpan(new BigDecimal(cur.getString("created_utc"))
                                 .longValue(), System.currentTimeMillis() / 1000l));
+                /*if(post.getDomain().contains("imgur")) {
+                    if (!post.getUrl().contains("/gallery/")
+                            && !post.getUrl().contains("/a/")) {
+                        post.setPicassoUrl("https://i.imgur.com/" +
+                                ImgurGalleryFetcher.getGalleryId(post
+                                        .getUrl()) + "s.jpg");
+                    } else {
+                        List<ImgurImage> imageList = null;
+                        if(post.getUrl().contains("/gallery/")) {
+                            imageList = ImgurGalleryFetcher
+                                    .getImagesFromGallery(ImgurGalleryFetcher
+                                            .getGalleryId(post.getUrl()), true, false);
+                        }
+                        if(post.getUrl().contains("/a/")) {
+                            imageList = ImgurGalleryFetcher
+                                    .getImagesFromGallery(ImgurGalleryFetcher
+                                            .getGalleryId(post.getUrl()), true, true);
+                        }
+                        if(imageList != null) {
+                            post.setPicassoUrl(imageList.get(0).getLink());
+                        }
+                    }
+                }
+                else post.setPicassoUrl(null);*/
+                post.setThumbnailUrl(cur.getString("thumbnail"));
                 if(post.getTitle() !=null)
                     postList.add(post);
             }
