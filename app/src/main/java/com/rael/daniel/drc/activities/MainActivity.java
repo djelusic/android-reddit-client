@@ -16,6 +16,7 @@ import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.fragments.ListFragment;
 import com.rael.daniel.drc.fragments.PostsFragment;
 import com.rael.daniel.drc.fragments.SubredditsFragment;
+import com.rael.daniel.drc.fragments.SubredditsRecyclerFragment;
 
 /**
 * Main activity, mostly acts as a container for fragments and
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.fragments_container
-                            , SubredditsFragment.newInstance(getApplicationContext()))
+                            , SubredditsRecyclerFragment.newInstance(getApplicationContext()))
                     .addToBackStack("Subreddits") //The default fragment
                     .commit();
         }

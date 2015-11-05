@@ -8,4 +8,6 @@ public class Consts {
     public static String USER_AGENT = "android:com.rael.daniel.drc:v0.1 (by /u/rurushu)";
     public static String IMGUR_CLIENT_ID = "4e48a899b999ca2";
     public static String IMGUR_API_URL = "https://api.imgur.com/3/";
+
+    public static boolean USE_RECYCLERVIEW = true;
 }

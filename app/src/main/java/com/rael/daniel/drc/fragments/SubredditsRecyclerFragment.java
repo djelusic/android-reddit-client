@@ -2,15 +2,12 @@ package com.rael.daniel.drc.fragments;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.View;
-import android.widget.TextView;
 
 import com.rael.daniel.drc.R;
-import com.rael.daniel.drc.misc.RedditRecyclerAdapter;
+import com.rael.daniel.drc.adapters.SubredditsRecyclerAdapter;
 import com.rael.daniel.drc.reddit_fetchers.ListFetcher;
 import com.rael.daniel.drc.reddit_fetchers.SubredditFetcher;
 import com.rael.daniel.drc.reddit_objects.RedditSubreddit;
@@ -20,27 +17,30 @@ import com.rael.daniel.drc.reddit_objects.RedditSubreddit;
  */
 public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit> {
 
-    public class SubredditViewHolder extends RecyclerView.ViewHolder {
-        TextView title;
-        TextView description;
-        public SubredditViewHolder(View itemView) {
-            super (itemView);
-            title = (TextView)itemView.findViewById(
-                    R.id.subreddit_title);
-            description = (TextView) itemView.findViewById(
-                    R.id.subreddit_description);
-        }
+    public SubredditsRecyclerFragment() {
+        this.item_layout_id = R.layout.subreddit_item_layout;
     }
 
-    public SubredditsRecyclerFragment() {
-        this.layout_id = R.layout.subreddit_rlist_layout;
-        this.rlist_id = R.id.subreddit_rlist;
+    @Override
+    public void myRefresh() {
+        initialized = false;
+        getList().clear();
+        lFetcher = new SubredditFetcher(getActivity()
+                .getApplicationContext());
+        initialize(false);
     }
 
     public static Fragment newInstance(Context applicationContext){
         SubredditsRecyclerFragment sf=new SubredditsRecyclerFragment();
         sf.lFetcher =new SubredditFetcher(applicationContext);
         return sf;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Set title
+        getActivity().setTitle("Subreddits");
     }
 
     @Override
@@ -57,7 +57,7 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
 
                 getFragmentManager().beginTransaction()
                         .replace(R.id.fragments_container, sf)
-                        .addToBackStack(null)
+                        .addToBackStack(query)
                         .commit();
                 return true;
             }
@@ -72,21 +72,7 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
 
     @Override
     protected void createAndBindAdapter() {
-        adapter =
-                new RedditRecyclerAdapter<RedditSubreddit>(getContext(), list,
-                        R.layout.subreddit_item_layout) {
-                    @Override
-                    protected RecyclerView.ViewHolder getHolder(View view) {
-                        return new SubredditViewHolder(view);
-                    }
-
-                    @Override
-                    protected void bindItem(RecyclerView.ViewHolder holder, int position) {
-                        SubredditViewHolder sHolder = (SubredditViewHolder)holder;
-                        sHolder.title.setText(getList().get(position).getUrl());
-                        sHolder.description.setText(getList().get(position).getTitle());
-                    }
-                };
+        adapter = new SubredditsRecyclerAdapter(getContext(), getList(), item_layout_id, rView);
         rView.setAdapter(adapter);
     }
 

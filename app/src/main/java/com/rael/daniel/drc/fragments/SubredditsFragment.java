@@ -26,7 +26,6 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
         layout_id = R.layout.subreddit_list_layout;
         item_layout_id = R.layout.subreddit_item_layout;
         list_id = R.id.subreddit_list;
-        loadMoreOnScroll = true;
     }
 
     public static Fragment newInstance(Context applicationContext){
@@ -60,7 +59,7 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Fragment sf = PostsFragment.newInstance(getActivity()
+                Fragment sf = PostsRecyclerFragment.newInstance(getActivity()
                         .getApplicationContext(),
                         query, null, null, false);
 

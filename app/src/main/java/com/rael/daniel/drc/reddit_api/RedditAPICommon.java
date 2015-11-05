@@ -30,11 +30,9 @@ public class RedditAPICommon {
 
     private class VoteTask extends AsyncTask<Void, Void, String> {
         private String body;
-        private ListFragment fragment;
 
-        VoteTask(String body, ListFragment fragment) {
+        VoteTask(String body) {
             this.body = body;
-            this.fragment = fragment;
         }
 
         @Override
@@ -132,9 +130,9 @@ public class RedditAPICommon {
         }
     }
 
-    public void vote(String id, int dir, ListFragment fragment) {
+    public void vote(String id, int dir) {
         VoteTask tsk = new VoteTask("id=" + id + "&dir="
-                + String.valueOf(dir), fragment);
+                + String.valueOf(dir));
         tsk.execute();
     }
 

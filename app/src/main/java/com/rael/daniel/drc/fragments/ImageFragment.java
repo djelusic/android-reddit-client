@@ -11,10 +11,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.rael.daniel.drc.R;
+import com.squareup.picasso.Picasso;
 
 
 public class ImageFragment extends Fragment {
-    ImageView imageView;
+    String url;
+    Context applicationContext;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -24,7 +26,8 @@ public class ImageFragment extends Fragment {
         View v = inflater.inflate(R.layout.imgur_image_layout
                 , container
                 , false);
-        this.imageView = (ImageView)v.findViewById(R.id.imgur_image);
+        Picasso.with(applicationContext).load(url)
+                .into((ImageView)v.findViewById(R.id.imgur_image));
         return v;
     }
 
@@ -32,12 +35,11 @@ public class ImageFragment extends Fragment {
         super();
     }
 
-    public static Fragment newInstance(){
+    public static Fragment newInstance(Context applicationContext, String url){
         ImageFragment cf=new ImageFragment();
+        cf.applicationContext = applicationContext;
+        cf.url = url;
         return cf;
     }
 
-    public ImageView getImageView() {
-        return imageView;
-    }
 }

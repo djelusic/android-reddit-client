@@ -254,14 +254,15 @@ public class PostsFragment extends ListFragment<RedditPost> {
                             new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    ImageFragment imf =
-                                            (ImageFragment)ImageFragment.newInstance();
-                                    Picasso.with(getContext()).load(posts.get(position).getUrl())
-                                            .into(imf.getImageView());
-                                    getFragmentManager().beginTransaction()
-                                            .replace(R.id.fragments_container, imf)
-                                            .addToBackStack("Image")
-                                            .commit();
+                                    if(posts.get(position).getUrl().endsWith("jpg")) {
+                                        ImageFragment imf =
+                                                (ImageFragment)ImageFragment.newInstance(
+                                                        getContext(), posts.get(position).getUrl());
+                                        getFragmentManager().beginTransaction()
+                                                .replace(R.id.fragments_container, imf)
+                                                .addToBackStack("Image")
+                                                .commit();
+                                    }
                                 }
                             }
                     );
@@ -299,7 +300,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
                     return;
                 }
                 new RedditAPICommon(getActivity().getApplicationContext())
-                        .vote(getList().get(position).getName(), 1, PostsFragment.this);
+                        .vote(getList().get(position).getName(), 1);
                 upvoteArrow.setColorFilter(ContextCompat
                         .getColor(getContext(), R.color.upvoteOrange));
                 downvoteArrow.setColorFilter(ContextCompat
@@ -317,7 +318,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
                     return;
                 }
                 new RedditAPICommon(getActivity().getApplicationContext())
-                        .vote(getList().get(position).getName(), -1, PostsFragment.this);
+                        .vote(getList().get(position).getName(), -1);
                 downvoteArrow.setColorFilter(ContextCompat
                         .getColor(getContext(), R.color.downvoteBlue));
                 upvoteArrow.setColorFilter(ContextCompat
