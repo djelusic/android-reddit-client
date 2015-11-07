@@ -18,6 +18,12 @@ public class RedditComment {
     private String title;
     private String[] moreChildren;
     private int depth;
+    private boolean hidden;
+
+    public RedditComment() {
+        super();
+        hidden = false;
+    }
 
     public boolean isMoreCommentsStub() {
         return user.equals("more");
@@ -145,5 +151,13 @@ public class RedditComment {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
 }

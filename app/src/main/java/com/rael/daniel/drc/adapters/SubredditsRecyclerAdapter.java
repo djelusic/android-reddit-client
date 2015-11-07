@@ -18,6 +18,8 @@ import java.util.List;
  * Created by Daniel on 05/11/2015.
  */
 public class SubredditsRecyclerAdapter extends RedditRecyclerAdapter<RedditSubreddit> {
+    ViewHolder.IViewHolderClick listener;
+
     public static class SubredditViewHolder extends RedditRecyclerAdapter.ViewHolder {
         TextView title;
         TextView description;
@@ -32,26 +34,15 @@ public class SubredditsRecyclerAdapter extends RedditRecyclerAdapter<RedditSubre
     }
 
     public SubredditsRecyclerAdapter(Context applicationContext,
-                                     List<RedditSubreddit> list, int item_layout_id, RecyclerView recyclerView) {
+                                     List<RedditSubreddit> list, int item_layout_id,
+                                     RecyclerView recyclerView, ViewHolder.IViewHolderClick listener) {
         super(applicationContext, list, item_layout_id, recyclerView);
+        this.listener = listener;
     }
 
     @Override
     protected RedditRecyclerAdapter.ViewHolder getHolder(View view) {
-        return new SubredditViewHolder(view, new ViewHolder.IViewHolderClick() {
-            @Override
-            public void onClick(View v, int position) {
-                String clickedSubreddit = getList().get(position).getUrl();
-                Fragment sf = PostsRecyclerFragment.newInstance(applicationContext,
-                        clickedSubreddit, null, null, false);
-
-                ((AppCompatActivity)applicationContext).getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragments_container, sf)
-                        .addToBackStack(clickedSubreddit)
-                        .commit();
-            }
-        });
+        return new SubredditViewHolder(view, listener);
     }
 
     @Override

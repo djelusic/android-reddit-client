@@ -173,12 +173,15 @@ public abstract class RecyclerFragment<T> extends Fragment {
                     super.onPreExecute();
                     // Show progress bar
                     if(contentView != null) { //Make sure the fragment is still visible
-                        contentView.findViewById(R.id.list_progress)
-                                .setVisibility(View.VISIBLE);
+                        //contentView.findViewById(R.id.list_progress)
+                        //        .setVisibility(View.VISIBLE);
                         contentView.findViewById(R.id.errors)
                                 .setVisibility(View.GONE);
-                        rView.setVisibility(View.GONE);
+                        //rView.setVisibility(View.GONE);
+                        list.add(0, null);
+                        createAndBindAdapter();
                     }
+                    //adapter.notifyItemInserted(0);
                 }
 
                 @Override
@@ -193,6 +196,8 @@ public abstract class RecyclerFragment<T> extends Fragment {
                 @Override
                 protected void onPostExecute(String result) {
                     super.onPostExecute(result);
+                    list.remove(0);
+                    adapter.notifyItemRemoved(0);
                     //Handle potential errors returned by the API
                     if(result != null && contentView != null) {
                         TextView errors = (TextView)contentView
@@ -207,15 +212,16 @@ public abstract class RecyclerFragment<T> extends Fragment {
                     else if(contentView != null) {
                         contentView.findViewById(R.id.errors)
                                 .setVisibility(View.GONE);
-                        contentView.findViewById(R.id.list_progress)
-                                .setVisibility(View.GONE);
-                        rView.setVisibility(View.VISIBLE);
+                        //contentView.findViewById(R.id.list_progress)
+                        //        .setVisibility(View.GONE);
+                        //rView.setVisibility(View.VISIBLE);
                     }
                     if(isUpdate)
                         adapter.notifyDataSetChanged();
                     else {
-                        createAndBindAdapter();
                         setLoadMoreListener();
+                        adapter.notifyDataSetChanged();
+                        //adapter.notifyItemRangeInserted(1, getList().size());
                     }
                 }
             }.execute((Void)null);

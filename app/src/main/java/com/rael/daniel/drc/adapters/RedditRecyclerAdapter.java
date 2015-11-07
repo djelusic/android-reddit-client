@@ -87,6 +87,8 @@ public abstract class RedditRecyclerAdapter<T> extends
         return list.get(position)!=null? VIEW_ITEM: VIEW_PROG;
     }
 
+
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         if(viewType == VIEW_ITEM) {
@@ -122,7 +124,7 @@ public abstract class RedditRecyclerAdapter<T> extends
 
     @Override
     public int getItemCount() {
-        return (null != getList() ? getList().size() : 0);
+        return (null != getList() ? getList().size(): 0);
     }
 
     protected abstract RedditRecyclerAdapter.ViewHolder getHolder(View view);

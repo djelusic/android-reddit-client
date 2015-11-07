@@ -2,29 +2,24 @@ package com.rael.daniel.drc.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.text.Html;
+import android.text.Spanned;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.rael.daniel.drc.R;
-import com.rael.daniel.drc.activities.MainActivity;
 import com.rael.daniel.drc.adapters.CommentsRecyclerAdapter;
-import com.rael.daniel.drc.adapters.SubredditsRecyclerAdapter;
-import com.rael.daniel.drc.dialogs.ReplyDialog;
-import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
 import com.rael.daniel.drc.reddit_fetchers.CommentFetcher;
 import com.rael.daniel.drc.reddit_fetchers.ListFetcher;
 import com.rael.daniel.drc.reddit_login.RedditLogin;
 import com.rael.daniel.drc.reddit_objects.RedditComment;
+import com.rael.daniel.drc.reddit_objects.RedditPost;
 import com.rael.daniel.drc.util.TimeSpan;
 
 import org.json.JSONArray;
@@ -38,14 +33,39 @@ import java.math.BigDecimal;
 public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
     String url;
     RedditComment link;
+    RedditPost newLink;
     View separatorView;
     boolean spinnerInit;
 
     public CommentsRecyclerFragment(){
         super();
         item_layout_id = R.layout.comment_item_layout;
+        layout_id = R.layout.comments_rlist_layout;
         loadMoreOnScroll = false;
     }
+
+    /*@Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View contentView = super.onCreateView(inflater,
+                container, savedInstanceState);
+        if(contentView != null) {
+            ((TextView)contentView.findViewById(R.id.link_title))
+                    .setText(newLink.getTitle());
+            ((TextView)contentView.findViewById(R.id.link_additional))
+                    .setText("by " + newLink.getAuthor() + ", " +
+                            newLink.getDate());
+            if(newLink.isSelfPost()) {
+                Spanned spannedText = Html.fromHtml(newLink.getSelftext());
+                if (spannedText.length() > 2 && !spannedText.toString().equals("null"))
+                    ((TextView)contentView.findViewById(R.id.link_selftext))
+                            .setText(spannedText.subSequence(0, spannedText.length() - 2));
+                contentView.findViewById(R.id.browser_image).setVisibility(View.GONE);
+            }
+        }
+        return contentView;
+    }*/
 
     @Override
     public void myRefresh() {
@@ -55,10 +75,12 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
         initialize(true);
     }
 
-    public static Fragment newInstance(Context applicationContext, String url){
+    public static Fragment newInstance(Context applicationContext, String url,
+                                       RedditPost link){
         CommentsRecyclerFragment cf=new CommentsRecyclerFragment();
         cf.url=url;
         cf.lFetcher =new CommentFetcher(applicationContext, cf.url, 0);
+        cf.newLink = link;
         return cf;
     }
 
@@ -123,7 +145,7 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
         return true;
     }*/
 
-    @Override
+    /*@Override
     protected void getAdditionalItems() {
         //Fill the first two main list elements so that the adapter knows
         //that there are supposed to be two headers
@@ -155,7 +177,7 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
                             .longValue(), System.currentTimeMillis() / 1000l));
         }
         catch(Exception e){ e.printStackTrace(); }
-    }
+    }*/
 
     public View setupSpinner() {
         /*separatorView = LayoutInflater.from(getContext())
@@ -192,7 +214,7 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
     @Override
     protected void createAndBindAdapter() {
         adapter = new CommentsRecyclerAdapter(getContext(), getList(),
-                item_layout_id, rView, link,this);
+                item_layout_id, rView, newLink,this);
         rView.setAdapter(adapter);
     }
 

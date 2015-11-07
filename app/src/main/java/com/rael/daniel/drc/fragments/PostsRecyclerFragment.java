@@ -2,15 +2,23 @@ package com.rael.daniel.drc.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.transition.TransitionInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.activities.SubmitActivity;
 import com.rael.daniel.drc.adapters.PostsRecyclerAdapter;
+import com.rael.daniel.drc.adapters.RedditRecyclerAdapter;
+import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 import com.rael.daniel.drc.reddit_fetchers.ListFetcher;
 import com.rael.daniel.drc.reddit_fetchers.PostFetcher;
 import com.rael.daniel.drc.reddit_login.RedditLogin;
@@ -154,7 +162,91 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
     @Override
     protected void createAndBindAdapter() {
         adapter = new PostsRecyclerAdapter(getContext(),
-                getList(), item_layout_id, rView, showSubreddit);
+                getList(), item_layout_id, rView, showSubreddit,
+                new RedditRecyclerAdapter.ViewHolder.IViewHolderClick() {
+            @Override
+            public void onClick(View v, int position) {
+                PostsRecyclerAdapter.PostViewHolder holder = (PostsRecyclerAdapter.PostViewHolder)v.getTag();
+                switch(v.getId()) {
+                    case R.id.upvote_arrow:
+                        if(!new RedditLogin(getContext()).isLoggedIn()) {
+                            Toast.makeText(getContext(), "Need to be logged in to vote.",
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        new RedditAPICommon(getContext())
+                                .vote(getList().get(position).getName(), 1);
+                        holder.upvoteArrow.setColorFilter(ContextCompat
+                                .getColor(getContext(), R.color.upvoteOrange));
+                        holder.downvoteArrow.setColorFilter(ContextCompat
+                                .getColor(getContext(), android.R.color.darker_gray));
+                        holder.postScore.setTextColor(ContextCompat
+                                .getColor(getContext(), R.color.upvoteOrange));
+                    case R.id.downvote_arrow:
+                        if(!new RedditLogin(getContext()).isLoggedIn()) {
+                            Toast.makeText(getContext(), "Need to be logged in to vote.",
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        new RedditAPICommon(getContext())
+                                .vote(getList().get(position).getName(), -1);
+                        holder.downvoteArrow.setColorFilter(ContextCompat
+                                .getColor(getContext(), R.color.downvoteBlue));
+                        holder.upvoteArrow.setColorFilter(ContextCompat
+                                .getColor(getContext(), android.R.color.darker_gray));
+                        holder.postScore.setTextColor(ContextCompat
+                                .getColor(getContext(), R.color.downvoteBlue));
+                    case R.id.link_thumbnail:
+                        if(getList().get(position).getUrl().endsWith("jpg")) {
+                            ImageFragment imf =
+                                    (ImageFragment) ImageFragment.newInstance(
+                                            getContext(), getList().get(position).getUrl());
+                            ((AppCompatActivity) getContext()).getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.fragments_container, imf)
+                                    .addToBackStack("Image")
+                                    .commit();
+                        }
+                    case R.id.browser_image:
+                        Fragment wvf =
+                                ImprovedWebViewFragment.newInstance(
+                                        getList().get(position).getUrl());
+                        ((AppCompatActivity) getContext()).getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragments_container, wvf)
+                                .addToBackStack("Web")
+                                .commit();
+                    default:
+                        RedditLogin rl = new RedditLogin(getContext());
+                        if(rl.isLoggedIn()) {
+                            SharedPreferences.Editor edit = getContext()
+                                    .getSharedPreferences(Consts.SPREFS_READ_POSTS + rl.getCurrentUser(),
+                                            Context.MODE_PRIVATE).edit();
+                            edit.putString(getList().get(position).getName(), "true").apply();
+                        }
+                        setSharedElementReturnTransition(TransitionInflater
+                                .from(getActivity()).inflateTransition(R.transition.test_transition));
+                        setExitTransition(TransitionInflater.from(getActivity())
+                                .inflateTransition(android.R.transition.explode));
+                        String postUrl = Consts.REDDIT_URL + getList().get(position).getPermalink() + ".json";
+                        Fragment cf = CommentsRecyclerFragment.newInstance(getContext(),
+                                postUrl, getList().get(position));
+                        cf.setSharedElementEnterTransition(TransitionInflater
+                                .from(getActivity()).inflateTransition(R.transition.test_transition));
+                        cf.setEnterTransition(TransitionInflater.from(getActivity())
+                                .inflateTransition(android.R.transition.explode));
+
+                        v.findViewById(R.id.post_item_layout).setTransitionName("post_comment");
+                        getActivity().getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragments_container, cf)
+                                .addToBackStack("Comments")
+                                .addSharedElement(v.findViewById(R.id.post_item_layout),
+                                        "post_comment")
+                                .commit();
+                }
+            }
+        });
         rView.setAdapter(adapter);
     }
 

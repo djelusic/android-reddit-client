@@ -9,15 +9,14 @@ import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.fragments.CommentsRecyclerFragment;
 import com.rael.daniel.drc.reddit_objects.RedditComment;
+import com.rael.daniel.drc.reddit_objects.RedditPost;
 
 import java.util.List;
 
@@ -25,24 +24,23 @@ import java.util.List;
  * Created by Daniel on 05/11/2015.
  */
 public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment> {
-    RedditComment link;
+    RedditPost link;
     CommentsRecyclerFragment fragment;
     boolean spinnerSetup = false;
     View separatorView;
 
-    private final int VIEW_TYPE_OP_COMMENT = 0;
-    private final int VIEW_TYPE_COMMENT_SEPARATOR = 1;
-    private final int VIEW_TYPE_REGULAR_COMMENT = 2;
-    private final int VIEW_TYPE_MORE_COMMENTS_STUB = 3;
-    private final int VIEW_TYPE_OP_LINK = 4;
-    private final int VIEW_TYPE_PROGRESS_BAR = 5;
+    private final int VIEW_TYPE_HEADER = 0;
+    private final int VIEW_TYPE_REGULAR_COMMENT = 1;
+    private final int VIEW_TYPE_MORE_COMMENTS_STUB = 2;
+    private final int VIEW_TYPE_PROGRESS_BAR = 3;
+    private final int VIEW_TYPE_COLLAPSED_ITEM = 4;
 
     public static class CommentViewHolder extends RedditRecyclerAdapter.ViewHolder {
         TextView commentUser;
         TextView commentScore;
         TextView commentText;
         TextView commentTime;
-        ViewGroup outerLayout;
+        ViewGroup indentHolder;
         ViewGroup innerLayout;
 
         public CommentViewHolder( View itemView, IViewHolderClick listener) {
@@ -55,83 +53,93 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
                     R.id.comment_text);
             commentTime = (TextView) itemView.findViewById(
                     R.id.comment_time);
-            outerLayout = (ViewGroup)itemView.findViewById(
-                    R.id.comment_outer_layout);
+            indentHolder = (ViewGroup)itemView.findViewById(
+                    R.id.indent_holder);
             innerLayout = (ViewGroup)itemView.findViewById(
                     R.id.comment_inner_layout);
         }
     }
-    public static class LinkViewHolder extends RedditRecyclerAdapter.ViewHolder {
+    public static class OPCommentViewHolder extends RedditRecyclerAdapter.ViewHolder {
+        ImageView browserImage;
         TextView linkTitle;
         TextView linkAdditional;
+        TextView linkSelftext;
 
-        public LinkViewHolder(View itemView, IViewHolderClick listener) {
+        public OPCommentViewHolder(View itemView, IViewHolderClick listener) {
             super(itemView, listener);
+            browserImage = (ImageView)itemView.findViewById(
+                    R.id.browser_image);
             linkTitle = (TextView)itemView.findViewById(
                     R.id.link_title);
             linkAdditional = (TextView)itemView.findViewById(
                     R.id.link_additional);
+            linkSelftext = (TextView)itemView.findViewById(
+                    R.id.link_selftext);
         }
     }
 
     public static class MoreCommentsStubHolder extends RedditRecyclerAdapter.ViewHolder {
         ViewGroup layout;
+        ViewGroup indentHolder;
 
         public MoreCommentsStubHolder(View itemView, IViewHolderClick listener) {
             super(itemView, listener);
             layout = (LinearLayout)itemView.findViewById(
                     R.id.more_comments_layout);
+            indentHolder = (LinearLayout)itemView.findViewById(
+                    R.id.indent_holder);
         }
     }
 
     public CommentsRecyclerAdapter(Context applicationContext, List<RedditComment> list,
                                    int item_layout_id, RecyclerView recyclerView,
-                                   RedditComment link, CommentsRecyclerFragment fragment) {
+                                   RedditPost link, CommentsRecyclerFragment fragment) {
         super(applicationContext, list, item_layout_id, recyclerView);
         this.link = link;
         this.fragment = fragment;
     }
 
+    private RedditComment getItem(int position) {
+        return getList().get(position - 1);
+    }
+
+    @Override
+    public int getItemCount() {
+        return (null != getList() ? getList().size() + 1: 1);
+    }
+
     @Override
     public int getItemViewType(int position) {
-        if(position == 0 && link.isSelfPost())
-            return VIEW_TYPE_OP_COMMENT;
-        if(position == 0 && !link.isSelfPost())
-            return VIEW_TYPE_OP_LINK;
-        if(position == 1)
-            return VIEW_TYPE_COMMENT_SEPARATOR;
-
-        if(getList().get(position).isMoreCommentsStub())
-            return VIEW_TYPE_MORE_COMMENTS_STUB;
-        if(getList().get(position) == null) {
+        if(position == 0)
+            return VIEW_TYPE_HEADER;
+        if(getItem(position) == null)
             return VIEW_TYPE_PROGRESS_BAR;
-        }
+        if(getItem(position).isHidden())
+            return VIEW_TYPE_COLLAPSED_ITEM;
+        if(getItem(position).isMoreCommentsStub())
+            return VIEW_TYPE_MORE_COMMENTS_STUB;
         return VIEW_TYPE_REGULAR_COMMENT;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        if(viewType == VIEW_TYPE_OP_COMMENT && link != null) {
+        if(viewType == VIEW_TYPE_PROGRESS_BAR) {
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.comment_item_layout, viewGroup, false);
-            return getHolder(view);
+                    .inflate(R.layout.progress_item, viewGroup, false);
+            return new ProgressViewHolder(view);
         }
-        if(viewType == VIEW_TYPE_OP_LINK && link != null){
+        if(viewType == VIEW_TYPE_HEADER && link != null) {
             View view = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.link_layout, viewGroup, false);
-            return new LinkViewHolder(view, null);
+                    .inflate(R.layout.op_comment_layout, viewGroup, false);
+            return new OPCommentViewHolder(view, null);
         }
         if(viewType == VIEW_TYPE_MORE_COMMENTS_STUB){
             View view = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.more_comments_layout, viewGroup, false);
             return new MoreCommentsStubHolder(view, null);
         }
-        if(viewType == VIEW_TYPE_COMMENT_SEPARATOR){
-            if(!spinnerSetup) {
-                separatorView = fragment.setupSpinner();
-                spinnerSetup = true;
-            }
-            return new RecyclerView.ViewHolder(separatorView) {
+        if(viewType == VIEW_TYPE_COLLAPSED_ITEM) {
+            return new RecyclerView.ViewHolder(new View(applicationContext)) {
                 @Override
                 public String toString() {
                     return super.toString();
@@ -146,9 +154,10 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
     }
 
     private void addRedditCommentStyle(ViewGroup outerLayout, ViewGroup innerLayout, int position) {
-        innerLayout.setBackgroundResource(getList().get(position).getDepth() % 2 == 0 ?
+        innerLayout.setBackgroundResource(getItem(position).getDepth() % 2 == 0 ?
                 R.drawable.borders_white : R.drawable.borders_grey);
-        for (int i = 0; i < getList().get(position).getDepth(); i++) {
+        outerLayout.removeAllViews();
+        for (int i = 0; i < getItem(position).getDepth(); i++) {
             View v = new View(applicationContext);
             v.setBackgroundResource(i % 2 == 0 ?
                     R.drawable.borders_white : R.drawable.borders_grey);
@@ -161,12 +170,21 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
 
     @Override
     protected void bindItem(RecyclerView.ViewHolder holder, int position) {
-        if((getItemViewType(position) == VIEW_TYPE_OP_COMMENT && link != null)
-                || getItemViewType(position) == VIEW_TYPE_REGULAR_COMMENT) {
-            RedditComment comment;
-            if(getItemViewType(position) == VIEW_TYPE_OP_COMMENT)
-                comment = link;
-            else comment = getList().get(position);
+        if(getItemViewType(position) == VIEW_TYPE_HEADER && link != null) {
+            OPCommentViewHolder opHolder = (OPCommentViewHolder) holder;
+            opHolder.linkTitle.setText(link.getTitle());
+            opHolder.linkAdditional.setText("by " + link.getAuthor()
+                    + ", " + link.getDate());
+            if(link.isSelfPost()) {
+                Spanned spannedText = Html.fromHtml(link.getSelftext());
+                if (spannedText.length() > 2 && !spannedText.toString().equals("null"))
+                    opHolder.linkSelftext.setText(spannedText
+                            .subSequence(0, spannedText.length() - 2));
+                opHolder.browserImage.setVisibility(View.GONE);
+            }
+        }
+        if(getItemViewType(position) == VIEW_TYPE_REGULAR_COMMENT) {
+            RedditComment comment = getItem(position);
             CommentViewHolder commentHolder = (CommentViewHolder) holder;
             commentHolder.commentUser.setText(comment.getUser());
             commentHolder.commentScore.setText(comment.getScore());
@@ -187,28 +205,32 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
             commentHolder.commentText
                     .setMovementMethod(LinkMovementMethod.getInstance());
 
-            if(getItemViewType(position) == VIEW_TYPE_REGULAR_COMMENT) {
-                addRedditCommentStyle(commentHolder.outerLayout,
-                        commentHolder.innerLayout, position);
-            }
-        }
-        if(getItemViewType(position) == VIEW_TYPE_OP_LINK && link != null) {
-            LinkViewHolder linkHolder = (LinkViewHolder) holder;
-            linkHolder.linkTitle.setText(link.getTitle());
-            linkHolder.linkAdditional.setText("by " +
-                    link.getUser() + " (" + link.getDomain() + ")");
+            addRedditCommentStyle(commentHolder.indentHolder,
+                    commentHolder.innerLayout, position);
         }
 
         //Handle "more comments" stubs
         if(getItemViewType(position) == VIEW_TYPE_MORE_COMMENTS_STUB) {
             MoreCommentsStubHolder moreHolder = (MoreCommentsStubHolder) holder;
-            addRedditCommentStyle(moreHolder.layout, moreHolder.layout, position);
+            addRedditCommentStyle(moreHolder.indentHolder, moreHolder.layout, position);
         }
 
     }
 
     @Override
     protected ViewHolder getHolder(View view) {
-        return new CommentViewHolder(view, null);
+        return new CommentViewHolder(view, new ViewHolder.IViewHolderClick() {
+            @Override
+            public void onClick(View v, int position) {
+                int i = position + 1;
+                boolean nextHidden = getItem(i).isHidden();
+                while(getItem(position).getDepth() <
+                        getItem(i).getDepth()) {
+                    getItem(i).setHidden(!nextHidden);
+                    i++;
+                }
+                notifyItemRangeChanged(position + 1, i - position - 1);
+            }
+        });
     }
 }

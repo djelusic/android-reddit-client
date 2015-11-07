@@ -1,6 +1,7 @@
 package com.rael.daniel.drc.reddit_fetchers;
 
 import android.content.Context;
+import android.text.Html;
 import android.util.Log;
 
 import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
@@ -83,6 +84,11 @@ public class PostFetcher extends ListFetcher<RedditPost> {
                 }
                 else post.setPicassoUrl(null);*/
                 post.setThumbnailUrl(cur.getString("thumbnail"));
+                if(cur.getString("is_self").equals("true"))
+                    post.setSelfPost(true);
+                else post.setSelfPost(false);
+                post.setSelftext(Html.fromHtml(cur
+                        .optString("selftext_html")).toString());
                 if(post.getTitle() !=null)
                     postList.add(post);
             }

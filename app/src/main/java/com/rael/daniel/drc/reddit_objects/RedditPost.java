@@ -18,6 +18,8 @@ public class RedditPost {
     private String date;
     private String clicked;
     private String thumbnailUrl;
+    private String selftext;
+    private boolean selfPost;
 
     public boolean isUpvoted() {
         return likes.equals("true");
@@ -137,5 +139,21 @@ public class RedditPost {
 
     public void setThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public String getSelftext() {
+        return selftext;
+    }
+
+    public void setSelftext(String selftext) {
+        this.selftext = selftext;
+    }
+
+    public boolean isSelfPost() {
+        return selfPost;
+    }
+
+    public void setSelfPost(boolean selfPost) {
+        this.selfPost = selfPost;
     }
 }

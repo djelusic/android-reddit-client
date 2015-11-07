@@ -30,17 +30,18 @@ import java.util.List;
  */
 public class PostsRecyclerAdapter extends RedditRecyclerAdapter<RedditPost> {
     private boolean showSubreddit;
+    ViewHolder.IViewHolderClick listener;
 
     public static class PostViewHolder extends RedditRecyclerAdapter.ViewHolder {
-        ImageView upvoteArrow;
-        TextView postScore;
-        ImageView downvoteArrow;
-        TextView postTitle;
-        TextView postDetails;
-        TextView postComments;
-        ImageView browserImage;
-        ImageView linkThumbnail;
-        TextView postSubreddit;
+        public ImageView upvoteArrow;
+        public TextView postScore;
+        public ImageView downvoteArrow;
+        public TextView postTitle;
+        public TextView postDetails;
+        public TextView postComments;
+        public ImageView browserImage;
+        public ImageView linkThumbnail;
+        public TextView postSubreddit;
 
         public PostViewHolder( View itemView, IViewHolderClick listener) {
             super (itemView, listener);
@@ -75,9 +76,10 @@ public class PostsRecyclerAdapter extends RedditRecyclerAdapter<RedditPost> {
 
     public PostsRecyclerAdapter(Context applicationContext, List<RedditPost> list,
                                 int item_layout_id, RecyclerView recyclerView,
-                                boolean showSubreddit) {
+                                boolean showSubreddit, ViewHolder.IViewHolderClick listener) {
         super(applicationContext, list, item_layout_id, recyclerView);
         this.showSubreddit = showSubreddit;
+        this.listener = listener;
     }
 
     @Override
@@ -157,79 +159,6 @@ public class PostsRecyclerAdapter extends RedditRecyclerAdapter<RedditPost> {
 
     @Override
     protected ViewHolder getHolder(View view) {
-        return new PostViewHolder(view, new ViewHolder.IViewHolderClick() {
-            @Override
-            public void onClick(View v, int position) {
-                PostViewHolder holder = (PostViewHolder)v.getTag();
-                switch(v.getId()) {
-                    case R.id.upvote_arrow:
-                        if(!new RedditLogin(applicationContext).isLoggedIn()) {
-                            Toast.makeText(applicationContext, "Need to be logged in to vote.",
-                                    Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        new RedditAPICommon(applicationContext)
-                                .vote(getList().get(position).getName(), 1);
-                        holder.upvoteArrow.setColorFilter(ContextCompat
-                                .getColor(applicationContext, R.color.upvoteOrange));
-                        holder.downvoteArrow.setColorFilter(ContextCompat
-                                .getColor(applicationContext, android.R.color.darker_gray));
-                        holder.postScore.setTextColor(ContextCompat
-                                .getColor(applicationContext, R.color.upvoteOrange));
-                    case R.id.downvote_arrow:
-                        if(!new RedditLogin(applicationContext).isLoggedIn()) {
-                            Toast.makeText(applicationContext, "Need to be logged in to vote.",
-                                    Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        new RedditAPICommon(applicationContext)
-                                .vote(getList().get(position).getName(), -1);
-                        holder.downvoteArrow.setColorFilter(ContextCompat
-                                .getColor(applicationContext, R.color.downvoteBlue));
-                        holder.upvoteArrow.setColorFilter(ContextCompat
-                                .getColor(applicationContext, android.R.color.darker_gray));
-                        holder.postScore.setTextColor(ContextCompat
-                                .getColor(applicationContext, R.color.downvoteBlue));
-                    case R.id.link_thumbnail:
-                        if(getList().get(position).getUrl().endsWith("jpg")) {
-                            ImageFragment imf =
-                                    (ImageFragment) ImageFragment.newInstance(
-                                            applicationContext, getList().get(position).getUrl());
-                            ((AppCompatActivity) applicationContext).getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .replace(R.id.fragments_container, imf)
-                                    .addToBackStack("Image")
-                                    .commit();
-                        }
-                    case R.id.browser_image:
-                        Fragment wvf =
-                                ImprovedWebViewFragment.newInstance(
-                                        getList().get(position).getUrl());
-                        ((AppCompatActivity) applicationContext).getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fragments_container, wvf)
-                                .addToBackStack("Web")
-                                .commit();
-                    default:
-                        RedditLogin rl = new RedditLogin(applicationContext);
-                        if(rl.isLoggedIn()) {
-                            SharedPreferences.Editor edit = applicationContext
-                                    .getSharedPreferences(Consts.SPREFS_READ_POSTS + rl.getCurrentUser(),
-                                            Context.MODE_PRIVATE).edit();
-                            edit.putString(getList().get(position).getName(), "true").apply();
-                        }
-
-
-                        String postUrl = Consts.REDDIT_URL + getList().get(position).getPermalink() + ".json";
-                        Fragment pf = CommentsRecyclerFragment.newInstance(applicationContext
-                                .getApplicationContext(), postUrl);
-
-                        ((AppCompatActivity)applicationContext).getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.fragments_container, pf)
-                                .addToBackStack("Comments")
-                                .commit();
-                }
-            }
-        });
+        return new PostViewHolder(view, listener);
     }
 }
