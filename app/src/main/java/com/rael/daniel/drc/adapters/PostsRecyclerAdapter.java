@@ -2,22 +2,14 @@ package com.rael.daniel.drc.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.Image;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.rael.daniel.drc.R;
-import com.rael.daniel.drc.fragments.CommentsFragment;
-import com.rael.daniel.drc.fragments.CommentsRecyclerFragment;
-import com.rael.daniel.drc.fragments.ImageFragment;
-import com.rael.daniel.drc.fragments.ImprovedWebViewFragment;
-import com.rael.daniel.drc.reddit_api.RedditAPICommon;
+
 import com.rael.daniel.drc.reddit_login.RedditLogin;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
 import com.rael.daniel.drc.util.Consts;

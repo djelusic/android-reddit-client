@@ -24,6 +24,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/link_title"
             android:id="@+id/link_additional"
-            android:textColor="@android:color/darker_gray"/>
+            android:textColor="?android:attr/textColorSecondary"/>
     </RelativeLayout>
 </LinearLayout>

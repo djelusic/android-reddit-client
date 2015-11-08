@@ -25,12 +25,7 @@ import com.rael.daniel.drc.reddit_objects.RedditPost;
 import com.rael.daniel.drc.util.Consts;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import imgur.ImgurGalleryFetcher;
-import imgur.ImgurImage;
-import imgur.PicassoImgurThumbnailTask;
 
 /**
  * Fragment that displays fetched posts
@@ -82,11 +77,8 @@ public class PostsFragment extends ListFragment<RedditPost> {
         super.onCreateOptionsMenu(menu, inflater);
         final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
                 .getActionView();
-        final MenuItem sortSubmenuContainer = menu.findItem(R.id.sort_submenu);
-        sortSubmenuContainer.setVisible(true);
         final MenuItem submit = menu.findItem(R.id.submit_menu_item);
         submit.setVisible(true);
-        final Menu sortSubmenu = sortSubmenuContainer.getSubMenu();
 
         sv.setQueryHint("Search this subreddit");
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -132,15 +124,15 @@ public class PostsFragment extends ListFragment<RedditPost> {
         if(super.onOptionsItemSelected(item))
             return true;
         switch (item.getItemId()) {
-            case R.id.sort_hot:
+            case R.id.sort_posts_hot:
                 sortingType = "hot";
                 myRefresh();
                 return true;
-            case R.id.sort_new:
+            case R.id.sort_posts_new:
                 sortingType = "new";
                 myRefresh();
                 return true;
-            case R.id.sort_top:
+            case R.id.sort_posts_top:
                 sortingType = "top";
                 myRefresh();
                 return true;

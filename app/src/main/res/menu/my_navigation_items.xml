@@ -14,6 +14,12 @@
         <item
             android:id="@+id/drawer_options"
             android:title="@string/options" />
+        <item
+            android:id="@+id/drawer_login"
+            android:title="@string/login" />
+        <item
+            android:id="@+id/drawer_logout"
+            android:title="@string/logout" />
     </group>
 
 </menu>

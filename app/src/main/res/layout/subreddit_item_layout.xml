@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/subreddit_title"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="?android:attr/textColorSecondary"
         />
     <!--<View
         android:id="@+id/divider"

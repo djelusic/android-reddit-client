@@ -80,13 +80,12 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        menu.setGroupVisible(R.id.sort_posts, true);
+        menu.setGroupVisible(R.id.sort_comments, false);
         final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
                 .getActionView();
-        final MenuItem sortSubmenuContainer = menu.findItem(R.id.sort_submenu);
-        sortSubmenuContainer.setVisible(true);
         final MenuItem submit = menu.findItem(R.id.submit_menu_item);
         submit.setVisible(true);
-        final Menu sortSubmenu = sortSubmenuContainer.getSubMenu();
 
         sv.setQueryHint("Search this subreddit");
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -99,7 +98,7 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
                         "relevance", false);
 
                 getFragmentManager().beginTransaction()
-                        .replace(R.id.fragments_container, sf)
+                        .replace(R.id.fragments_container, sf, "Search")
                         .addToBackStack("Search")
                         .commit();
                 sv.clearFocus();
@@ -114,6 +113,19 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
 
     }
 
+    private int getSortTypeId(String sortingType) {
+        //default sorting type is hot
+        if(sortingType == null) return 0;
+        switch(sortingType) {
+            case "hot" : return 0;
+            case "new" : return 1;
+            case "rising" : return 2;
+            case "controversial" : return 3;
+            case "top" : return 4;
+            default : return 0;
+        }
+    }
+
     //Sets visibility of submit menu item
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
@@ -125,6 +137,8 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
         else {
             menu.findItem(R.id.submit_menu_item).setVisible(false);
         }
+        MenuItem item = menu.getItem(getSortTypeId(sortingType) + 1);
+        item.setChecked(true);
     }
 
     @Override
@@ -132,15 +146,23 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
         if(super.onOptionsItemSelected(item))
             return true;
         switch (item.getItemId()) {
-            case R.id.sort_hot:
+            case R.id.sort_posts_hot:
                 sortingType = "hot";
                 myRefresh();
                 return true;
-            case R.id.sort_new:
+            case R.id.sort_posts_new:
                 sortingType = "new";
                 myRefresh();
                 return true;
-            case R.id.sort_top:
+            case R.id.sort_posts_rising:
+                sortingType = "rising";
+                myRefresh();
+                return true;
+            case R.id.sort_posts_controversial:
+                sortingType = "controversial";
+                myRefresh();
+                return true;
+            case R.id.sort_posts_top:
                 sortingType = "top";
                 myRefresh();
                 return true;
@@ -203,7 +225,7 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
                                             getContext(), getList().get(position).getUrl());
                             ((AppCompatActivity) getContext()).getSupportFragmentManager()
                                     .beginTransaction()
-                                    .replace(R.id.fragments_container, imf)
+                                    .replace(R.id.fragments_container, imf, "Image")
                                     .addToBackStack("Image")
                                     .commit();
                         }
@@ -213,7 +235,7 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
                                         getList().get(position).getUrl());
                         ((AppCompatActivity) getContext()).getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.fragments_container, wvf)
+                                .replace(R.id.fragments_container, wvf, "Web")
                                 .addToBackStack("Web")
                                 .commit();
                     default:
@@ -226,15 +248,15 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
                         }
                         setSharedElementReturnTransition(TransitionInflater
                                 .from(getActivity()).inflateTransition(R.transition.test_transition));
-                        setExitTransition(TransitionInflater.from(getActivity())
-                                .inflateTransition(android.R.transition.explode));
+                        /*setExitTransition(TransitionInflater.from(getActivity())
+                                .inflateTransition(android.R.transition.explode));*/
                         String postUrl = Consts.REDDIT_URL + getList().get(position).getPermalink() + ".json";
                         Fragment cf = CommentsRecyclerFragment.newInstance(getContext(),
                                 postUrl, getList().get(position));
                         cf.setSharedElementEnterTransition(TransitionInflater
                                 .from(getActivity()).inflateTransition(R.transition.test_transition));
-                        cf.setEnterTransition(TransitionInflater.from(getActivity())
-                                .inflateTransition(android.R.transition.explode));
+                        /*cf.setEnterTransition(TransitionInflater.from(getActivity())
+                                .inflateTransition(android.R.transition.explode));*/
 
                         v.findViewById(R.id.post_item_layout).setTransitionName("post_comment");
                         getActivity().getSupportFragmentManager()

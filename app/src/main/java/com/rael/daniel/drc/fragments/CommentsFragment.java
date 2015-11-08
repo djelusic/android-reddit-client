@@ -221,11 +221,11 @@ public class CommentsFragment extends ListFragment<RedditComment>{
 
     private void addRedditCommentStyle(ViewGroup outerLayout, ViewGroup innerLayout, int position) {
         innerLayout.setBackgroundResource(getList().get(position).getDepth() % 2 == 0 ?
-                        R.drawable.borders_white : R.drawable.borders_grey);
+                        R.drawable.borders_primary : R.drawable.borders_secondary);
         for (int i = 0; i < getList().get(position).getDepth(); i++) {
             View v = new View(getContext());
             v.setBackgroundResource(i % 2 == 0 ?
-                    R.drawable.borders_white : R.drawable.borders_grey);
+                    R.drawable.borders_primary : R.drawable.borders_secondary);
             //v.setBackgroundColor(i%2 == 0 ? Color.WHITE : Color.parseColor("#F2F2F2"));
             v.setLayoutParams(new LinearLayout.LayoutParams(20, LinearLayout.
                     LayoutParams.MATCH_PARENT));

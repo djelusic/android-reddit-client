@@ -50,17 +50,18 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        menu.setGroupVisible(R.id.sort_posts, false);
         final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
                 .getActionView();
         sv.setQueryHint("Enter a subreddit manually");
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Fragment sf = PostsFragment.newInstance(getActivity()
+                Fragment sf = PostsRecyclerFragment.newInstance(getActivity()
                         .getApplicationContext(), query, null, "", false);
 
                 getFragmentManager().beginTransaction()
-                        .replace(R.id.fragments_container, sf)
+                        .replace(R.id.fragments_container, sf, query)
                         .addToBackStack(query)
                         .commit();
                 return true;
@@ -94,7 +95,7 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
 
                         getActivity().getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.fragments_container, sf)
+                                .replace(R.id.fragments_container, sf, clickedSubreddit)
                                 .addToBackStack(clickedSubreddit)
                                 //.addSharedElement(contentView.findViewById(R.id.subreddit_item), "sub_post_transition")
                                 .commit();

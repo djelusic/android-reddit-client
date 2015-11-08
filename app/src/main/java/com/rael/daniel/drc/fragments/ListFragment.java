@@ -66,7 +66,7 @@ public abstract class ListFragment<T> extends Fragment {
         inflater.inflate(R.menu.search_action_bar, menu);
     }
 
-    //Sets visibility of login/logout menu items
+    /*//Sets visibility of login/logout menu items
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
@@ -79,9 +79,9 @@ public abstract class ListFragment<T> extends Fragment {
             menu.findItem(R.id.login).setVisible(true);
             menu.findItem(R.id.logout).setVisible(false);
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.login:
@@ -98,7 +98,7 @@ public abstract class ListFragment<T> extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -1,30 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:yourapp="http://schemas.android.com/apk/res-auto" >
+    xmlns:yourapp="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/action_bar_menu">
     <item android:id="@+id/action_search"
         android:title="@string/manual_search_subreddit"
         android:icon="@drawable/ic_search_white_24dp"
         yourapp:showAsAction="ifRoom|collapseActionView"
         yourapp:actionViewClass="android.support.v7.widget.SearchView" />
 
-    <item android:id="@+id/login"
-        android:title="@string/login"/>
+    <group
+        android:id="@+id/sort_posts"
+        android:checkableBehavior="single"
+        >
 
-    <item android:id="@+id/logout"
-        android:title="@string/logout"/>
+        <item
+            android:id="@+id/sort_posts_hot"
+            android:title="@string/sort_hot"
+            />
 
-    <item android:title="Sort"
-        android:id="@+id/sort_submenu"
-        android:visible="false">
-        <menu>
-            <item android:id="@+id/sort_hot"
-                android:title="hot" />
-            <item android:id="@+id/sort_new"
-                android:title="new" />
-            <item android:id="@+id/sort_top"
-                android:title="top" />
-        </menu>
-    </item>
+        <item
+            android:id="@+id/sort_posts_new"
+            android:title="@string/sort_new"
+            />
+
+        <item
+            android:id="@+id/sort_posts_rising"
+            android:title="@string/sort_rising"
+            />
+
+        <item
+            android:id="@+id/sort_posts_controversial"
+            android:title="@string/sort_controversial"
+            />
+
+        <item
+            android:id="@+id/sort_posts_top"
+            android:title="@string/sort_top"
+            />
+
+    </group>
+
+    <group
+        android:id="@+id/sort_comments"
+        android:checkableBehavior="single"
+        >
+
+        <item
+            android:id="@+id/sort_comments_best"
+            android:title="@string/sort_best"
+            />
+
+        <item
+            android:id="@+id/sort_comments_top"
+            android:title="@string/sort_top"
+            />
+
+        <item
+            android:id="@+id/sort_comments_new"
+            android:title="@string/sort_new"
+            />
+
+        <item
+            android:id="@+id/sort_comments_controversial"
+            android:title="@string/sort_controversial"
+            />
+
+        <item
+            android:id="@+id/sort_comments_old"
+            android:title="@string/sort_old"
+            />
+
+    </group>
 
     <item android:title="Submit"
         android:id="@+id/submit_menu_item"

@@ -1,5 +1,11 @@
 <resources>
 
+    <attr name="moreCommentsTextColor" format="reference|color" />
+    <attr name="commentBackgroundPrimary" format="reference|color" />
+    <attr name="commentBackgroundSecondary" format="reference|color" />
+    <attr name="listDivider" format="reference|color" />
+    <attr name="drawableColor" format="reference|color" />
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -7,8 +13,28 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <!--<item name="android:windowBackground">@color/darkBackground</item>
-        <item name="android:textColor">@android:color/white</item>-->
+        <item name="android:textColorSecondary">@android:color/darker_gray</item>
+        <item name="moreCommentsTextColor">@color/moreCommentsBlue</item>
+        <item name="commentBackgroundPrimary">@android:color/white</item>
+        <item name="commentBackgroundSecondary">@color/commentGreyLight</item>
+        <item name="listDivider">@color/listDivider</item>
+        <item name="drawableColor">@android:color/black</item>
+    </style>
+    <style name="AppThemeDark" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/darkBackground</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/darker_gray</item>
+        <item name="moreCommentsTextColor">@color/moreCommentsBlue</item>
+        <item name="commentBackgroundPrimary">@color/darkBackground</item>
+        <item name="commentBackgroundSecondary">@color/commentGreyDark</item>
+        <item name="listDivider">@color/listDividerDark</item>
+        <item name="drawableColor">@android:color/white</item>
     </style>
 
 </resources>

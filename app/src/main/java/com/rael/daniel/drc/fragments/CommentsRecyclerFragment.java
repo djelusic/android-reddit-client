@@ -1,6 +1,7 @@
 package com.rael.daniel.drc.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,11 +9,15 @@ import android.text.Html;
 import android.text.Spanned;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.rael.daniel.drc.R;
+import com.rael.daniel.drc.activities.SubmitActivity;
 import com.rael.daniel.drc.adapters.CommentsRecyclerAdapter;
 import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
 import com.rael.daniel.drc.reddit_fetchers.CommentFetcher;
@@ -32,6 +37,7 @@ import java.math.BigDecimal;
  */
 public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
     String url;
+    String sortingType = null;
     RedditComment link;
     RedditPost newLink;
     View separatorView;
@@ -96,6 +102,67 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
             menu.add("Upvote");
             menu.add("Downvote");
             menu.add("Reply");
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.setGroupVisible(R.id.sort_posts, false);
+        menu.setGroupVisible(R.id.sort_comments, true);
+    }
+
+    private int getSortTypeId(String sortingType) {
+        //default sorting type is best
+        if(sortingType == null) return 0;
+        switch(sortingType) {
+            case "best" : return 0;
+            case "top" : return 1;
+            case "new" : return 2;
+            case "controversial" : return 3;
+            case "old" : return 4;
+            default : return 0;
+        }
+    }
+
+    //Sets visibility of submit menu item
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.getItem(getSortTypeId(sortingType) + 6);
+        item.setChecked(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(super.onOptionsItemSelected(item))
+            return true;
+        switch (item.getItemId()) {
+            case R.id.sort_comments_best:
+                sortingType = "best";
+                break;
+            case R.id.sort_comments_top:
+                sortingType = "top";
+                break;
+            case R.id.sort_comments_new:
+                sortingType = "new";
+                break;
+            case R.id.sort_comments_controversial:
+                sortingType = "controversial";
+                break;
+            case R.id.sort_comments_old:
+                sortingType = "old";
+                break;
+            default:
+                break;
+        }
+        if(sortingType == null) {
+            return true;
+        }
+        else {
+            url = url.replaceAll("json.*", "json?sort=" + sortingType);
+            myRefresh();
+            return true;
         }
     }
 

@@ -79,7 +79,7 @@ public abstract class RecyclerFragment<T> extends Fragment {
     }
 
     //Sets visibility of login/logout menu items
-    @Override
+    /*@Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if(new RedditLogin(getActivity().getApplicationContext())
@@ -91,19 +91,19 @@ public abstract class RecyclerFragment<T> extends Fragment {
             menu.findItem(R.id.login).setVisible(true);
             menu.findItem(R.id.logout).setVisible(false);
         }
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.login:
+            /*case R.id.login:
                 Intent i = new Intent(getActivity(), LoginActivity.class);
                 startActivityForResult(i, 1);
                 return true;
             case R.id.logout:
                 new RedditLogin(getContext()).logout();
                 myRefresh();
-                return true;
+                return true;*/
             case R.id.refresh_button:
                 myRefresh();
                 return true;

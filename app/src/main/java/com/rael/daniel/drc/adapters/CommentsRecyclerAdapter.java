@@ -42,6 +42,7 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
         TextView commentTime;
         ViewGroup indentHolder;
         ViewGroup innerLayout;
+        View divider;
 
         public CommentViewHolder( View itemView, IViewHolderClick listener) {
             super (itemView, listener);
@@ -57,6 +58,7 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
                     R.id.indent_holder);
             innerLayout = (ViewGroup)itemView.findViewById(
                     R.id.comment_inner_layout);
+            divider = itemView.findViewById(R.id.divider);
         }
     }
     public static class OPCommentViewHolder extends RedditRecyclerAdapter.ViewHolder {
@@ -155,12 +157,12 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
 
     private void addRedditCommentStyle(ViewGroup outerLayout, ViewGroup innerLayout, int position) {
         innerLayout.setBackgroundResource(getItem(position).getDepth() % 2 == 0 ?
-                R.drawable.borders_white : R.drawable.borders_grey);
+                R.drawable.borders_primary : R.drawable.borders_secondary);
         outerLayout.removeAllViews();
         for (int i = 0; i < getItem(position).getDepth(); i++) {
             View v = new View(applicationContext);
             v.setBackgroundResource(i % 2 == 0 ?
-                    R.drawable.borders_white : R.drawable.borders_grey);
+                    R.drawable.borders_primary : R.drawable.borders_secondary);
             //v.setBackgroundColor(i%2 == 0 ? Color.WHITE : Color.parseColor("#F2F2F2"));
             v.setLayoutParams(new LinearLayout.LayoutParams(20, LinearLayout.
                     LayoutParams.MATCH_PARENT));
@@ -181,11 +183,16 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
                     opHolder.linkSelftext.setText(spannedText
                             .subSequence(0, spannedText.length() - 2));
                 opHolder.browserImage.setVisibility(View.GONE);
+                opHolder.linkSelftext.setVisibility(View.VISIBLE);
             }
         }
         if(getItemViewType(position) == VIEW_TYPE_REGULAR_COMMENT) {
             RedditComment comment = getItem(position);
             CommentViewHolder commentHolder = (CommentViewHolder) holder;
+            if(position == 1)
+                commentHolder.divider.setVisibility(View.GONE);
+            else
+                commentHolder.divider.setVisibility(View.VISIBLE);
             commentHolder.commentUser.setText(comment.getUser());
             commentHolder.commentScore.setText(comment.getScore());
             Spanned spannedText = Html.fromHtml(comment.getText());
