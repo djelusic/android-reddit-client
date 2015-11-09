@@ -3,15 +3,19 @@ package com.rael.daniel.drc.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.transition.TransitionInflater;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.rael.daniel.drc.R;
@@ -35,6 +39,7 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
     private boolean showSubreddit;
 
     public PostsRecyclerFragment() {
+        this.layout_id = R.layout.post_rlist_layout;
         this.item_layout_id = R.layout.post_item_layout;
     }
 
@@ -77,6 +82,26 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
         return pf;
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        contentView.findViewById(R.id.post_fab).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!new RedditLogin(getContext()).isLoggedIn()) {
+                    Toast.makeText(getContext(), "Need to be logged in to submit.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Intent i = new Intent(getContext(), SubmitActivity.class);
+                i.putExtra("subreddit", subreddit);
+                startActivityForResult(i, 0);
+            }
+        });
+        return contentView;
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -84,15 +109,13 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
         menu.setGroupVisible(R.id.sort_comments, false);
         final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
                 .getActionView();
-        final MenuItem submit = menu.findItem(R.id.submit_menu_item);
-        submit.setVisible(true);
 
         sv.setQueryHint("Search this subreddit");
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 query = query.replace(" ", "+");
-                Fragment sf = PostsFragment.newInstance(getActivity()
+                Fragment sf = PostsRecyclerFragment.newInstance(getActivity()
                                 .getApplicationContext(),
                         subreddit, "q=" + query + "&restrict_sr=on&sort=relevance&t=all",
                         "relevance", false);
@@ -130,13 +153,6 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if(new RedditLogin(getActivity().getApplicationContext())
-                .isLoggedIn()) {
-            menu.findItem(R.id.submit_menu_item).setVisible(true);
-        }
-        else {
-            menu.findItem(R.id.submit_menu_item).setVisible(false);
-        }
         MenuItem item = menu.getItem(getSortTypeId(sortingType) + 1);
         item.setChecked(true);
     }
@@ -166,10 +182,6 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
                 sortingType = "top";
                 myRefresh();
                 return true;
-            case R.id.submit_menu_item:
-                Intent i = new Intent(getContext(), SubmitActivity.class);
-                i.putExtra("subreddit", subreddit);
-                startActivityForResult(i, 0);
             default:
                 return false;
         }
@@ -229,6 +241,17 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
                                     .addToBackStack("Image")
                                     .commit();
                         }
+                        else {
+                            Fragment wvf =
+                                    ImprovedWebViewFragment.newInstance(
+                                            getList().get(position).getUrl());
+                            ((AppCompatActivity) getContext()).getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.fragments_container, wvf, "Web")
+                                    .addToBackStack("Web")
+                                    .commit();
+                        }
+                        return;
                     case R.id.browser_image:
                         Fragment wvf =
                                 ImprovedWebViewFragment.newInstance(
@@ -238,6 +261,7 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
                                 .replace(R.id.fragments_container, wvf, "Web")
                                 .addToBackStack("Web")
                                 .commit();
+                        return;
                     default:
                         RedditLogin rl = new RedditLogin(getContext());
                         if(rl.isLoggedIn()) {

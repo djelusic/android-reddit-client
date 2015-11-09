@@ -72,10 +72,6 @@
 
     </group>
 
-    <item android:title="Submit"
-        android:id="@+id/submit_menu_item"
-        android:visible="false" />
-
     <item android:id="@+id/refresh_button"
         android:title="@string/refresh"
         android:icon="@drawable/ic_refresh_white_24dp"

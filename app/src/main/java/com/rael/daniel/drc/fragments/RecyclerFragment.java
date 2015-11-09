@@ -1,10 +1,12 @@
 package com.rael.daniel.drc.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.rael.daniel.drc.activities.LoginActivity;
@@ -38,6 +41,7 @@ public abstract class RecyclerFragment<T> extends Fragment {
     int layout_id, rlist_id, item_layout_id;
     boolean initialized = false;
     boolean loadMoreOnScroll = true;
+    CoordinatorLayout.Behavior behavior;
 
     public RecyclerFragment() {
         this.layout_id = R.layout.rlist_layout;

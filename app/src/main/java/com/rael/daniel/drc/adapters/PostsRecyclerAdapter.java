@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,6 +14,7 @@ import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.reddit_login.RedditLogin;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
 import com.rael.daniel.drc.util.Consts;
+import com.rael.daniel.drc.util.RoundedTransformation;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -130,7 +132,9 @@ public class PostsRecyclerAdapter extends RedditRecyclerAdapter<RedditPost> {
 
         //Selfposts don't contain external links
         if(getList().get(position).getDomain().startsWith("self")) {
-            postViewHolder.browserImage.setVisibility(View.GONE);
+            postViewHolder.browserImage.setVisibility(View.VISIBLE);
+            postViewHolder.browserImage.setImageDrawable(applicationContext
+                    .getDrawable(R.drawable.ic_play_circle_outline_white_24dp));
             postViewHolder.linkThumbnail.setVisibility(View.GONE);
         }
 
@@ -140,11 +144,16 @@ public class PostsRecyclerAdapter extends RedditRecyclerAdapter<RedditPost> {
             postViewHolder.browserImage.setVisibility(View.GONE);
             postViewHolder.linkThumbnail
                     .setVisibility(View.VISIBLE);
+            float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    35, applicationContext.getResources().getDisplayMetrics());
             Picasso.with(applicationContext).load(getList().get(position)
-                    .getThumbnailUrl()).fit().into(postViewHolder.linkThumbnail);
+                    .getThumbnailUrl()).transform(new RoundedTransformation(10, 0))
+                    .resize((int) px, (int) px).centerCrop().into(postViewHolder.linkThumbnail);
         }
         else {
             postViewHolder.browserImage.setVisibility(View.VISIBLE);
+            postViewHolder.browserImage.setImageDrawable(applicationContext
+                    .getDrawable(R.drawable.ic_language_black_24dp));
             postViewHolder.linkThumbnail.setVisibility(View.GONE);
         }
     }

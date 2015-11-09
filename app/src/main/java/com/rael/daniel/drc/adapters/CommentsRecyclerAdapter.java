@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -155,14 +156,30 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
         }
     }
 
+    //Renders a comment with proper indentation
     private void addRedditCommentStyle(ViewGroup outerLayout, ViewGroup innerLayout, int position) {
-        innerLayout.setBackgroundResource(getItem(position).getDepth() % 2 == 0 ?
-                R.drawable.borders_primary : R.drawable.borders_secondary);
+        //get primary color
+        TypedValue typedValue = new TypedValue();
+        applicationContext.getTheme()
+                .resolveAttribute(R.attr.commentBackgroundPrimary, typedValue, true);
+        //we don't want top level comments to have a divider on the left side
+        if(getItem(position).getDepth() == 0) {
+            innerLayout.setBackgroundColor(typedValue.data);
+        }
+        else {
+            innerLayout.setBackgroundResource(getItem(position).getDepth() % 2 == 0 ?
+                    R.drawable.borders_primary : R.drawable.borders_secondary);
+        }
         outerLayout.removeAllViews();
         for (int i = 0; i < getItem(position).getDepth(); i++) {
             View v = new View(applicationContext);
-            v.setBackgroundResource(i % 2 == 0 ?
-                    R.drawable.borders_primary : R.drawable.borders_secondary);
+            if(i == 0) {
+                v.setBackgroundColor(typedValue.data);
+            }
+            else {
+                v.setBackgroundResource(i % 2 == 0 ?
+                        R.drawable.borders_primary : R.drawable.borders_secondary);
+            }
             //v.setBackgroundColor(i%2 == 0 ? Color.WHITE : Color.parseColor("#F2F2F2"));
             v.setLayoutParams(new LinearLayout.LayoutParams(20, LinearLayout.
                     LayoutParams.MATCH_PARENT));

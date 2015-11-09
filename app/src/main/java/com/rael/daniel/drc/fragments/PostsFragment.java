@@ -77,8 +77,8 @@ public class PostsFragment extends ListFragment<RedditPost> {
         super.onCreateOptionsMenu(menu, inflater);
         final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
                 .getActionView();
-        final MenuItem submit = menu.findItem(R.id.submit_menu_item);
-        submit.setVisible(true);
+        //final MenuItem submit = menu.findItem(R.id.submit_menu_item);
+        //submit.setVisible(true);
 
         sv.setQueryHint("Search this subreddit");
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -107,7 +107,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
     }
 
     //Sets visibility of submit menu item
-    @Override
+    /*@Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if(new RedditLogin(getActivity().getApplicationContext())
@@ -117,9 +117,9 @@ public class PostsFragment extends ListFragment<RedditPost> {
         else {
             menu.findItem(R.id.submit_menu_item).setVisible(false);
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(super.onOptionsItemSelected(item))
             return true;
@@ -143,7 +143,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
             default:
                 return false;
         }
-    }
+    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

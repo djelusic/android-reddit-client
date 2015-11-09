@@ -51,6 +51,7 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.setGroupVisible(R.id.sort_posts, false);
+        menu.setGroupVisible(R.id.sort_comments, false);
         final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
                 .getActionView();
         sv.setQueryHint("Enter a subreddit manually");
