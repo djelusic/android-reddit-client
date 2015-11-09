@@ -39,6 +39,56 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/main_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="16dp"
+            app:backgroundTint="@color/fabColor"
+            android:src="@drawable/ic_create_white_24dp"
+            app:layout_behavior="com.rael.daniel.drc.util.ScrollAwareFABBehavior"
+            android:elevation="5dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/sub_fab_third"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="22dp"
+            android:layout_marginEnd="80dp"
+            app:backgroundTint="@color/fabColor"
+            app:layout_behavior="com.rael.daniel.drc.util.ScrollAwareFABBehavior"
+            app:fabSize="mini"
+            android:elevation="5dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/sub_fab_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="22dp"
+            android:layout_marginEnd="128dp"
+            app:backgroundTint="@color/fabColor"
+            app:layout_behavior="com.rael.daniel.drc.util.ScrollAwareFABBehavior"
+            app:fabSize="mini"
+            android:elevation="5dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/sub_fab_first"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="22dp"
+            android:layout_marginEnd="176dp"
+            app:backgroundTint="@color/fabColor"
+            app:layout_behavior="com.rael.daniel.drc.util.ScrollAwareFABBehavior"
+            app:fabSize="mini"
+            android:elevation="5dp" />
         </android.support.design.widget.CoordinatorLayout>
         <android.support.design.widget.NavigationView
             android:id="@+id/navigation"
@@ -46,5 +96,6 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             app:menu="@menu/my_navigation_items"
+            app:backgroundTint="@color/fabColor"
             app:headerLayout="@layout/nav_header"/>
 </android.support.v4.widget.DrawerLayout>

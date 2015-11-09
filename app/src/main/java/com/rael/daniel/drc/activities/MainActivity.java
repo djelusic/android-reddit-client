@@ -2,6 +2,8 @@ package com.rael.daniel.drc.activities;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.Window;
 
 import com.rael.daniel.drc.R;
+import com.rael.daniel.drc.fragments.IFragmentCallback;
 import com.rael.daniel.drc.fragments.ListFragment;
 import com.rael.daniel.drc.fragments.PostsFragment;
 import com.rael.daniel.drc.fragments.PostsRecyclerFragment;
@@ -25,15 +28,18 @@ import com.rael.daniel.drc.reddit_login.RedditLogin;
 
 /**
 * Main activity, mostly acts as a container for fragments and
-* the navigation drawer.
+* global UI elements.
 * */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IFragmentCallback {
     private Toolbar toolbar;
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navDrawer;
     private DrawerLayout drawerLayout;
     private boolean stateChanged = false;
 
+    public FloatingActionButton getFAB() {
+        return (FloatingActionButton)findViewById(R.id.main_fab);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,5 +201,19 @@ public class MainActivity extends AppCompatActivity {
     //Set to true when fragment on backstack needs to reload
     public void setStateChanged(boolean stateChangedFlag) {
         this.stateChanged = stateChangedFlag;
+    }
+
+    @Override
+    public FloatingActionButton getSubFAB(int position) {
+        if(position == 0) {
+            return (FloatingActionButton)findViewById(R.id.sub_fab_first);
+        }
+        if(position == 1) {
+            return (FloatingActionButton)findViewById(R.id.sub_fab_second);
+        }
+        if(position == 2) {
+            return (FloatingActionButton)findViewById(R.id.sub_fab_third);
+        }
+        return null;
     }
 }

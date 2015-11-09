@@ -41,6 +41,7 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
     public PostsRecyclerFragment() {
         this.layout_id = R.layout.post_rlist_layout;
         this.item_layout_id = R.layout.post_item_layout;
+        fabVisibility = true;
     }
 
     public String createUrl() {
@@ -82,24 +83,17 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
         return pf;
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        contentView.findViewById(R.id.post_fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!new RedditLogin(getContext()).isLoggedIn()) {
-                    Toast.makeText(getContext(), "Need to be logged in to submit.",
-                            Toast.LENGTH_LONG).show();
-                    return;
-                }
-                Intent i = new Intent(getContext(), SubmitActivity.class);
-                i.putExtra("subreddit", subreddit);
-                startActivityForResult(i, 0);
-            }
-        });
-        return contentView;
+    protected void FABOnClick() {
+        super.FABOnClick();
+        if (!new RedditLogin(getContext()).isLoggedIn()) {
+            Toast.makeText(getContext(), "Need to be logged in to submit.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        Intent i = new Intent(getContext(), SubmitActivity.class);
+        i.putExtra("subreddit", subreddit);
+        startActivityForResult(i, 0);
     }
 
     @Override

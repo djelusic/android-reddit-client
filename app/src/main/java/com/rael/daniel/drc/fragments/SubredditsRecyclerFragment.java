@@ -1,8 +1,8 @@
 package com.rael.daniel.drc.fragments;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.transition.TransitionInflater;
 import android.view.Menu;
@@ -23,6 +23,8 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
 
     public SubredditsRecyclerFragment() {
         this.item_layout_id = R.layout.subreddit_item_layout;
+        this.fab_icon = R.drawable.ic_add_white_24dp;
+        this.fabVisibility = true;
     }
 
     @Override
@@ -32,6 +34,15 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
         lFetcher = new SubredditFetcher(getActivity()
                 .getApplicationContext());
         initialize(false);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //Hide fab, might implement something later
+        if(fragmentCallback != null) {
+            fragmentCallback.getFAB().setVisibility(View.GONE);
+        }
     }
 
     public static Fragment newInstance(Context applicationContext){

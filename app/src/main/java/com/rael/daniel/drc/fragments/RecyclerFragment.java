@@ -3,28 +3,30 @@ package com.rael.daniel.drc.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.rael.daniel.drc.activities.LoginActivity;
 import com.rael.daniel.drc.R;
-import com.rael.daniel.drc.activities.MainActivity;
 import com.rael.daniel.drc.adapters.RedditRecyclerAdapter;
 import com.rael.daniel.drc.reddit_fetchers.ListFetcher;
-import com.rael.daniel.drc.reddit_login.RedditLogin;
+import com.rael.daniel.drc.util.LinearLayoutManagerWithSmoothScroller;
+import com.rael.daniel.drc.util.ScrollAwareFABBehavior;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,16 +41,45 @@ public abstract class RecyclerFragment<T> extends Fragment {
     RedditRecyclerAdapter<T> adapter;
     ListFetcher<T> lFetcher;
     int layout_id, rlist_id, item_layout_id;
+    int fab_icon;
     boolean initialized = false;
     boolean loadMoreOnScroll = true;
-    CoordinatorLayout.Behavior behavior;
+    boolean fabVisibility = false;
+    boolean subFabVisibility = false;
+    int numSubFabsVisible = 0;
+    IFragmentCallback fragmentCallback;
 
     public RecyclerFragment() {
         this.layout_id = R.layout.rlist_layout;
         this.rlist_id = R.id.rlist;
+        this.fab_icon = R.drawable.ic_create_white_24dp;
         contentView = null;
         list = new ArrayList<>();
         setHasOptionsMenu(true);
+    }
+
+    protected void FABOnClick() {
+        //default behavior, main FAB just opens a submenu
+        if(numSubFabsVisible > 0 && !subFabVisibility) {
+            setSubFABsVisible(numSubFabsVisible);
+            subFabVisibility = true;
+        }
+        else hideSubFABs();
+    }
+    private void setFABOnClickListener() {
+        if(fragmentCallback != null) {
+            fragmentCallback.getFAB().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FABOnClick();
+                }
+            });
+        }
+    }
+    protected void setSubFABOnClickListener(int subFabId, View.OnClickListener listener) {
+        if(fragmentCallback != null && listener != null) {
+            fragmentCallback.getSubFAB(subFabId).setOnClickListener(listener);
+        }
     }
 
     @Override
@@ -65,16 +96,70 @@ public abstract class RecyclerFragment<T> extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
         contentView=inflater.inflate(layout_id
                 , container
                 , false);
         rView =(RecyclerView)contentView.findViewById(rlist_id);
-        rView.setLayoutManager(new LinearLayoutManager(getContext()));
+        rView.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(getContext()));
         initialize(false);
         initialized = true;
         return contentView;
+    }
+
+    protected void setFABVisibility(FloatingActionButton fab, boolean visibility) {
+        CoordinatorLayout.LayoutParams params =
+                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+        params.setBehavior(new ScrollAwareFABBehavior(!visibility));
+        fab.setLayoutParams(params);
+        if(visibility) fab.show();
+        else fab.hide();
+    }
+
+    protected void setSubFABsVisible(int numSubFabsVisible) {
+        for(int i = 0; i < 3; i++) {
+            if(i < numSubFabsVisible) {
+                setFABVisibility(fragmentCallback.getSubFAB(2 - i), true);
+            }
+            else setFABVisibility(fragmentCallback.getSubFAB(2 - i), false);
+        }
+    }
+
+    protected void hideSubFABs() {
+        for(int i = 0; i < 3; i++) {
+            setFABVisibility(fragmentCallback.getSubFAB(i), false);
+        }
+        subFabVisibility = false;
+    }
+
+    protected void setFABIcon(FloatingActionButton fab, int drawable) {
+        Drawable mDrawable = getContext().getDrawable(drawable);
+        TypedValue typedValue = new TypedValue();
+        getContext().getTheme().resolveAttribute(R.attr.drawableColor, typedValue, true);
+        if(mDrawable != null) mDrawable.mutate().setTint(typedValue.data);
+        fab.setImageDrawable(mDrawable);
+    }
+
+    protected void setSubFABIcon(int position, int drawable) {
+        if(fragmentCallback != null) {
+            fragmentCallback.getSubFAB(position).setImageDrawable(
+                    getContext().getDrawable(drawable));
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof IFragmentCallback) {
+            fragmentCallback = (IFragmentCallback) context;
+            setFABVisibility(fragmentCallback.getFAB(), fabVisibility);
+            setFABIcon(fragmentCallback.getFAB(), fab_icon);
+            setFABOnClickListener();
+            hideSubFABs();
+            subFabVisibility = false;
+        }
     }
 
     @Override
@@ -82,32 +167,9 @@ public abstract class RecyclerFragment<T> extends Fragment {
         inflater.inflate(R.menu.search_action_bar, menu);
     }
 
-    //Sets visibility of login/logout menu items
-    /*@Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        if(new RedditLogin(getActivity().getApplicationContext())
-                .isLoggedIn()) {
-            menu.findItem(R.id.login).setVisible(false);
-            menu.findItem(R.id.logout).setVisible(true);
-        }
-        else {
-            menu.findItem(R.id.login).setVisible(true);
-            menu.findItem(R.id.logout).setVisible(false);
-        }
-    }*/
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            /*case R.id.login:
-                Intent i = new Intent(getActivity(), LoginActivity.class);
-                startActivityForResult(i, 1);
-                return true;
-            case R.id.logout:
-                new RedditLogin(getContext()).logout();
-                myRefresh();
-                return true;*/
             case R.id.refresh_button:
                 myRefresh();
                 return true;
@@ -154,9 +216,17 @@ public abstract class RecyclerFragment<T> extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(((MainActivity)getActivity()).isStateChanged()) {
+        if(fragmentCallback.isStateChanged()) {
             myRefresh();
-            ((MainActivity)getActivity()).setStateChanged(false);
+            fragmentCallback.setStateChanged(false);
+        }
+        if(getActivity() instanceof IFragmentCallback) {
+            fragmentCallback = (IFragmentCallback) getActivity();
+            setFABVisibility(fragmentCallback.getFAB(), fabVisibility);
+            setFABIcon(fragmentCallback.getFAB(), fab_icon);
+            setFABOnClickListener();
+            hideSubFABs();
+            subFabVisibility = false;
         }
     }
 
@@ -177,15 +247,11 @@ public abstract class RecyclerFragment<T> extends Fragment {
                     super.onPreExecute();
                     // Show progress bar
                     if(contentView != null) { //Make sure the fragment is still visible
-                        //contentView.findViewById(R.id.list_progress)
-                        //        .setVisibility(View.VISIBLE);
                         contentView.findViewById(R.id.errors)
                                 .setVisibility(View.GONE);
-                        //rView.setVisibility(View.GONE);
                         list.add(0, null);
                         createAndBindAdapter();
                     }
-                    //adapter.notifyItemInserted(0);
                 }
 
                 @Override
@@ -216,16 +282,12 @@ public abstract class RecyclerFragment<T> extends Fragment {
                     else if(contentView != null) {
                         contentView.findViewById(R.id.errors)
                                 .setVisibility(View.GONE);
-                        //contentView.findViewById(R.id.list_progress)
-                        //        .setVisibility(View.GONE);
-                        //rView.setVisibility(View.VISIBLE);
                     }
                     if(isUpdate)
                         adapter.notifyDataSetChanged();
                     else {
                         setLoadMoreListener();
                         adapter.notifyDataSetChanged();
-                        //adapter.notifyItemRangeInserted(1, getList().size());
                     }
                 }
             }.execute((Void)null);

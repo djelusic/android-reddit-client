@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.ContextMenu;
@@ -48,30 +49,10 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
         item_layout_id = R.layout.comment_item_layout;
         layout_id = R.layout.comments_rlist_layout;
         loadMoreOnScroll = false;
+        this.fab_icon = R.drawable.ic_navigation_white_24dp;
+        this.fabVisibility = true;
+        this.numSubFabsVisible = 2;
     }
-
-    /*@Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View contentView = super.onCreateView(inflater,
-                container, savedInstanceState);
-        if(contentView != null) {
-            ((TextView)contentView.findViewById(R.id.link_title))
-                    .setText(newLink.getTitle());
-            ((TextView)contentView.findViewById(R.id.link_additional))
-                    .setText("by " + newLink.getAuthor() + ", " +
-                            newLink.getDate());
-            if(newLink.isSelfPost()) {
-                Spanned spannedText = Html.fromHtml(newLink.getSelftext());
-                if (spannedText.length() > 2 && !spannedText.toString().equals("null"))
-                    ((TextView)contentView.findViewById(R.id.link_selftext))
-                            .setText(spannedText.subSequence(0, spannedText.length() - 2));
-                contentView.findViewById(R.id.browser_image).setVisibility(View.GONE);
-            }
-        }
-        return contentView;
-    }*/
 
     @Override
     public void myRefresh() {
@@ -91,8 +72,40 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        setFABIcon(fragmentCallback.getSubFAB(1),
+                R.drawable.ic_keyboard_arrow_down_black_24dp);
+        setSubFABOnClickListener(1, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Find next root comment
+                int firstVisible = ((LinearLayoutManager)rView.getLayoutManager())
+                        .findFirstVisibleItemPosition();
+                for (int i = firstVisible + 1; i < getList().size(); i++) {
+                    if (getList().get(i - 1).getDepth() == 0) {
+                        rView.smoothScrollToPosition(i);
+                        break;
+                    }
+                }
+            }
+        });
+        setFABIcon(fragmentCallback.getSubFAB(2),
+                R.drawable.ic_keyboard_arrow_up_black_24dp);
+        setSubFABOnClickListener(2, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int firstVisible = ((LinearLayoutManager)rView.getLayoutManager())
+                        .findFirstVisibleItemPosition();
+                //Find previous root comment
+                for (int i = firstVisible - 1; i >= 0; i--) {
+                    if (getList().get(i - 1).getDepth() == 0) {
+                        rView.smoothScrollToPosition(i);
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -211,72 +224,6 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
         }
         return true;
     }*/
-
-    /*@Override
-    protected void getAdditionalItems() {
-        //Fill the first two main list elements so that the adapter knows
-        //that there are supposed to be two headers
-        //TODO: make it less hacky
-        getList().add(0, new RedditComment());
-        getList().add(1, new RedditComment());
-        try {
-            RedditConnectionManager conn =
-                    new RedditConnectionManager(getContext());
-            String rawData = conn.readContents(url.replaceAll("\\?ref.*", ".json"));
-            JSONObject selfPostData = new JSONArray(rawData).getJSONObject(0)
-                    .getJSONObject("data")
-                    .getJSONArray("children")
-                    .getJSONObject(0)
-                    .getJSONObject("data");
-            link = new RedditComment();
-            link.setText(Html.fromHtml(selfPostData
-                    .getString("selftext_html")).toString());
-            link.setDomain(selfPostData.getString("domain"));
-            link.setUser(selfPostData.getString("author"));
-            link.setScore(selfPostData.getString("score"));
-            link.setName(selfPostData.getString("name"));
-            link.setLikes(selfPostData.getString("likes"));
-            link.setNumComments(selfPostData.getString("num_comments"));
-            link.setTitle(selfPostData.getString("title"));
-            link.setUrl(selfPostData.getString("url"));
-            link.setDate(TimeSpan
-                    .calculateTimeSpan(new BigDecimal(selfPostData.getString("created_utc"))
-                            .longValue(), System.currentTimeMillis() / 1000l));
-        }
-        catch(Exception e){ e.printStackTrace(); }
-    }*/
-
-    public View setupSpinner() {
-        /*separatorView = LayoutInflater.from(getContext())
-                .inflate(R.layout.comments_separator_layout, null);
-        *//*if(link.isSelfPost())
-            ((TextView)separatorView.findViewById(R.id.num_comments))
-                    .setText(link.getNumComments() + " comments");*//*
-        final Spinner spinner = (Spinner)separatorView.findViewById(R.id.sortSpinner);
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.sort_types, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (spinnerInit) {
-                    String selected = spinner.getSelectedItem().toString();
-                    if (selected.equals("contr.")) selected = "controversial";
-                    url = url.replaceAll("json.*", "json?sort=" + selected);
-                    myRefresh();
-                } else spinnerInit = true;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });*/
-        return new View(getContext());
-    }
 
     @Override
     protected void createAndBindAdapter() {

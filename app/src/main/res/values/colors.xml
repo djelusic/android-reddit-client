@@ -12,4 +12,5 @@
     <color name="commentGreyDark">#383838</color>
     <color name="listDivider">#bebebe</color>
     <color name="listDividerDark">#666666</color>
+    <color name="fabColor">#FBC02D</color>
 </resources>
