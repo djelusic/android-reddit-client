@@ -5,5 +5,5 @@ A simple work in progress open source reddit client for android. Designed mostly
 This app doesn't have a specific license. You are free to copy and modify it however you wish. You may not publish this app on the Google Play store without permission.
 
 # Screenshots
-![Posts Window](/Screenshots/posts.png?raw=true =300x)
-![Comments Window](/Screenshots/comments.png?raw=true =300x)
+<img src="/Screenshots/posts.png" width="300">
+<img src="/Screenshots/comments.png" width="300">
