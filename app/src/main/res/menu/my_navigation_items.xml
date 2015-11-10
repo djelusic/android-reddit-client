@@ -7,10 +7,16 @@
             android:title="@string/front" />
         <item
             android:id="@+id/drawer_subreddits"
-            android:title="@string/subreddits" />
+            android:title="@string/my_subreddits" />
         <item
             android:id="@+id/drawer_all"
             android:title="@string/all" />
+        <item
+            android:id="@+id/drawer_user"
+            android:title="@string/user" />
+        <item
+            android:id="@+id/drawer_subreddit"
+            android:title="@string/subreddit" />
         <item
             android:id="@+id/drawer_options"
             android:title="@string/options" />

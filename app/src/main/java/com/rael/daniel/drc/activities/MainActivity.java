@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.view.Window;
 
 import com.rael.daniel.drc.R;
+import com.rael.daniel.drc.dialogs.ReplyDialog;
+import com.rael.daniel.drc.dialogs.SubredditSearchDialog;
 import com.rael.daniel.drc.fragments.IFragmentCallback;
 import com.rael.daniel.drc.fragments.ListFragment;
 import com.rael.daniel.drc.fragments.PostsFragment;
@@ -114,6 +116,10 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
                 fragment = PostsRecyclerFragment.newInstance(this, "all", null, null, true);
                 name = "all";
                 break;
+            case R.id.drawer_subreddit:
+                SubredditSearchDialog sd = new SubredditSearchDialog(this);
+                sd.show();
+                break;
             case R.id.drawer_login:
                 Intent i = new Intent(this, LoginActivity.class);
                 startActivityForResult(i, 1);
@@ -122,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
                 new RedditLogin(getApplicationContext()).logout();
                 refreshTopFragment();
                 invalidateOptionsMenu();
+                break;
             default:
                 break;
         }

@@ -13,7 +13,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/reply_send_button"
+        android:id="@+id/reply_button"
         android:layout_below="@id/reply_text"
         android:text="@string/reply_button"
         android:layout_alignParentStart="true"/>
@@ -21,10 +21,10 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/reply_cancel_button"
+        android:id="@+id/cancel_button"
         android:layout_below="@+id/reply_text"
         android:text="@string/cancel_button"
-        android:layout_toEndOf="@+id/reply_send_button"/>
+        android:layout_toEndOf="@+id/reply_button"/>
 
 
 </RelativeLayout>

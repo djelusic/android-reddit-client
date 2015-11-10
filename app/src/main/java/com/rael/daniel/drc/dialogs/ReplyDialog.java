@@ -2,7 +2,6 @@ package com.rael.daniel.drc.dialogs;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -25,7 +24,7 @@ public class ReplyDialog extends Dialog{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.reply_dialog_layout);
-        findViewById(R.id.reply_send_button).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.reply_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditText replyText = (EditText) findViewById(R.id.reply_text);
@@ -34,7 +33,7 @@ public class ReplyDialog extends Dialog{
                 dismiss();
             }
         });
-        findViewById(R.id.reply_cancel_button).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.cancel_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();

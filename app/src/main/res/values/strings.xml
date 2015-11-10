@@ -46,4 +46,9 @@
     <string name="sort_top">top</string>
     <string name="sort_best">best</string>
     <string name="sort_old">old</string>
+    <string name="user">User</string>
+    <string name="subreddit">Subreddit</string>
+    <string name="enter_subreddit">Enter a subreddit</string>
+    <string name="view_button">View</string>
+    <string name="my_subreddits">My Subreddits</string>
 </resources>
