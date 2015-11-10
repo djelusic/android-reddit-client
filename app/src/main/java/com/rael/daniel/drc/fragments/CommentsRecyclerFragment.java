@@ -1,37 +1,21 @@
 package com.rael.daniel.drc.fragments;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.rael.daniel.drc.R;
-import com.rael.daniel.drc.activities.SubmitActivity;
 import com.rael.daniel.drc.adapters.CommentsRecyclerAdapter;
-import com.rael.daniel.drc.reddit_api.RedditConnectionManager;
 import com.rael.daniel.drc.reddit_fetchers.CommentFetcher;
 import com.rael.daniel.drc.reddit_fetchers.ListFetcher;
 import com.rael.daniel.drc.reddit_login.RedditLogin;
 import com.rael.daniel.drc.reddit_objects.RedditComment;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
-import com.rael.daniel.drc.util.TimeSpan;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.math.BigDecimal;
 
 /**
  * Created by Daniel on 05/11/2015.
@@ -39,10 +23,7 @@ import java.math.BigDecimal;
 public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
     String url;
     String sortingType = null;
-    RedditComment link;
-    RedditPost newLink;
-    View separatorView;
-    boolean spinnerInit;
+    RedditPost link;
 
     public CommentsRecyclerFragment(){
         super();
@@ -67,7 +48,7 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
         CommentsRecyclerFragment cf=new CommentsRecyclerFragment();
         cf.url=url;
         cf.lFetcher =new CommentFetcher(applicationContext, cf.url, 0);
-        cf.newLink = link;
+        cf.link = link;
         return cf;
     }
 
@@ -98,7 +79,7 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
                 int firstVisible = ((LinearLayoutManager)rView.getLayoutManager())
                         .findFirstVisibleItemPosition();
                 //Find previous root comment
-                for (int i = firstVisible - 1; i >= 0; i--) {
+                for (int i = firstVisible - 1; i > 0; i--) {
                     if (getList().get(i - 1).getDepth() == 0) {
                         rView.smoothScrollToPosition(i);
                         break;
@@ -228,7 +209,7 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
     @Override
     protected void createAndBindAdapter() {
         adapter = new CommentsRecyclerAdapter(getContext(), getList(),
-                item_layout_id, rView, newLink,this);
+                item_layout_id, rView, link,this);
         rView.setAdapter(adapter);
     }
 
