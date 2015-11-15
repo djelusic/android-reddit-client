@@ -20,7 +20,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 /**
- * Created by Daniel on 05/11/2015.
+ * Adapter for posts RecyclerView
  */
 public class PostsRecyclerAdapter extends RedditRecyclerAdapter<RedditPost> {
     private boolean showSubreddit;

@@ -24,7 +24,7 @@ public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
 
     public SubredditFetcher(Context applicationContext) {
         super(applicationContext);
-        if(new RedditLogin(applicationContext).isLoggedIn())
+        if (new RedditLogin(applicationContext).isLoggedIn())
             url = Consts.REDDIT_URL + "/subreddits/mine/.json";
         else url = Consts.REDDIT_URL + "/subreddits/default/.json";
         after = "";
@@ -36,25 +36,24 @@ public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
                 new RedditConnectionManager(applicationContext);
         rawData = conn.readContents(url);
         try {
-            JSONObject data=new JSONObject(rawData)
+            JSONObject data = new JSONObject(rawData)
                     .getJSONObject("data");
-            JSONArray children=data.getJSONArray("children");
-            after=data.getString("after");
+            JSONArray children = data.getJSONArray("children");
+            after = data.getString("after");
 
-            for(int i=0;i<children.length();i++){
-                JSONObject cur=children.getJSONObject(i)
+            for (int i = 0; i < children.length(); i++) {
+                JSONObject cur = children.getJSONObject(i)
                         .getJSONObject("data");
-                RedditSubreddit th=new RedditSubreddit();
+                RedditSubreddit th = new RedditSubreddit();
                 th.setUrl(cur.optString("url"));
                 StringTokenizer st = new StringTokenizer(th.getUrl(), "/");
                 st.nextToken();
                 th.setUrl(st.nextToken());
                 th.setTitle(cur.optString("title"));
-                if(th.getTitle() !=null)
+                if (th.getTitle() != null)
                     subredditList.add(th);
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             Log.e("fetchSubreddits()", e.toString());
         }
         return subredditList;
@@ -62,11 +61,11 @@ public class SubredditFetcher extends ListFetcher<RedditSubreddit> {
 
     @Override
     public List<RedditSubreddit> getMoreItems() {
-        if(new RedditLogin(applicationContext).isLoggedIn())
+        if (new RedditLogin(applicationContext).isLoggedIn())
             url = Consts.REDDIT_URL + "/subreddits/mine/.json"
-                    +"?after=" + after;
+                    + "?after=" + after;
         else url = Consts.REDDIT_URL + "/subreddits/default/.json"
-                +"?after=" + after;
+                + "?after=" + after;
 
         return getItems();
     }

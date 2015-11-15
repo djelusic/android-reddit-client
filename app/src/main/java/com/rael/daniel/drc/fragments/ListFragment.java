@@ -28,7 +28,8 @@ import java.util.List;
 
 /**
  * Generic fragment for displaying content on Reddit
-* */
+ * TODO: remove this after RecyclerView refactor is finished
+ */
 public abstract class ListFragment<T> extends Fragment {
     protected ListView lView;
     protected ArrayAdapter<T> adapter;
@@ -39,7 +40,7 @@ public abstract class ListFragment<T> extends Fragment {
     protected boolean loadMoreOnScroll;
     protected View contentView;
 
-    public ListFragment(){
+    public ListFragment() {
         contentView = null;
         setList(new ArrayList<T>());
         setHasOptionsMenu(true);
@@ -55,7 +56,7 @@ public abstract class ListFragment<T> extends Fragment {
         contentView = inflater.inflate(layout_id
                 , container
                 , false);
-        lView =(ListView)contentView.findViewById(list_id);
+        lView = (ListView) contentView.findViewById(list_id);
         initialize(false);
         initialized = true;
         return contentView;
@@ -109,9 +110,9 @@ public abstract class ListFragment<T> extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(((MainActivity)getActivity()).isStateChanged()) {
+        if (((MainActivity) getActivity()).isStateChanged()) {
             myRefresh();
-            ((MainActivity)getActivity()).setStateChanged(false);
+            ((MainActivity) getActivity()).setStateChanged(false);
         }
     }
 
@@ -121,24 +122,23 @@ public abstract class ListFragment<T> extends Fragment {
     }
 
 
-
     // Refresh current fragment after logging in
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == Activity.RESULT_OK)
+        if (resultCode == Activity.RESULT_OK)
             myRefresh();
     }
 
-    protected void initialize(final boolean isUpdate){
+    protected void initialize(final boolean isUpdate) {
 
-        if(!initialized){
+        if (!initialized) {
             new AsyncTask<Void, Void, String>() {
                 @Override
                 protected void onPreExecute() {
                     super.onPreExecute();
                     // Show progress bar
-                    if(contentView != null) { //Make sure the fragment is still visible
+                    if (contentView != null) { //Make sure the fragment is still visible
                         contentView.findViewById(R.id.list_progress)
                                 .setVisibility(View.VISIBLE);
                         contentView.findViewById(R.id.errors)
@@ -160,8 +160,8 @@ public abstract class ListFragment<T> extends Fragment {
                 protected void onPostExecute(String result) {
                     super.onPostExecute(result);
                     //Handle potential errors returned by the API
-                    if(result != null && contentView != null) {
-                        TextView errors = (TextView)contentView
+                    if (result != null && contentView != null) {
+                        TextView errors = (TextView) contentView
                                 .findViewById(R.id.errors);
                         errors.setText(lFetcher.getErrors());
                         errors.setVisibility(View.VISIBLE);
@@ -170,19 +170,19 @@ public abstract class ListFragment<T> extends Fragment {
                         return;
                     }
                     // Hide progress bar
-                    else if(contentView != null) {
+                    else if (contentView != null) {
                         contentView.findViewById(R.id.errors)
                                 .setVisibility(View.GONE);
                         contentView.findViewById(R.id.list_progress)
                                 .setVisibility(View.GONE);
                         lView.setVisibility(View.VISIBLE);
                     }
-                    if(isUpdate)
+                    if (isUpdate)
                         notifyChange();
                     else createAdapter();
                 }
-            }.execute((Void)null);
-        }else{
+            }.execute((Void) null);
+        } else {
             createAdapter();
         }
     }
@@ -201,15 +201,15 @@ public abstract class ListFragment<T> extends Fragment {
         return 0;
     }
 
-    private void createAdapter(){
+    private void createAdapter() {
 
         // Make sure this fragment is still a part of the activity.
-        if(getActivity()==null) return;
+        if (getActivity() == null) return;
 
 
-        adapter=new ArrayAdapter<T>(getActivity()
-                ,item_layout_id
-                , getList()){
+        adapter = new ArrayAdapter<T>(getActivity()
+                , item_layout_id
+                , getList()) {
             @Override
             public View getView(int position,
                                 View convertView,
@@ -232,21 +232,23 @@ public abstract class ListFragment<T> extends Fragment {
         };
         registerForContextMenu(lView);
         lView.setAdapter(adapter);
-        if(loadMoreOnScroll) {
+        if (loadMoreOnScroll) {
             lView.setOnScrollListener(new AbsListView.OnScrollListener() {
                 private boolean isLoading = false;
 
                 @Override
-                public void onScrollStateChanged(AbsListView view, int scrollState) {}
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                }
 
                 @Override
                 public void onScroll(AbsListView view, int firstVisibleItem,
                                      int visibleItemCount, int totalItemCount) {
                     int lastIndex = firstVisibleItem + visibleItemCount;
-                    if (totalItemCount >0 && lastIndex == getList()
+                    if (totalItemCount > 0 && lastIndex == getList()
                             .size() && lFetcher.hasMoreItems() && !isLoading) {
                         new AsyncTask<Void, Void, String>() {
                             View progressBar;
+
                             @Override
                             protected void onPreExecute() {
                                 progressBar = getActivity().getLayoutInflater()
@@ -265,7 +267,7 @@ public abstract class ListFragment<T> extends Fragment {
                             @Override
                             protected void onPostExecute(String result) {
                                 super.onPostExecute(result);
-                                if(result != null) {
+                                if (result != null) {
                                     //TODO this doesn't work properly
                                     Toast.makeText(getContext(), result, Toast.LENGTH_LONG).show();
                                 }
@@ -273,15 +275,18 @@ public abstract class ListFragment<T> extends Fragment {
                                 isLoading = false;
                                 lView.removeFooterView(progressBar);
                             }
-                        }.execute((Void)null);
+                        }.execute((Void) null);
                     }
                 }
             });
         }
     }
 
-    void getAdditionalItems() {} //Implement in superclass
+    void getAdditionalItems() {
+    } //Implement in superclass
+
     abstract View fillItems(List<T> list, View convertView, int position);
+
     abstract void setOnClick(List<T> list, ListView lView, int position);
 
     public List<T> getList() {

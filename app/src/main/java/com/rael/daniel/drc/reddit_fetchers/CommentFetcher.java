@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-* Gets all the comments from a given post
-* */
+ * Gets all the comments from a given post
+ */
 public class CommentFetcher extends ListFetcher<RedditComment> {
     private int startingDepth;
 
@@ -49,8 +49,9 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
                     .getJSONObject("data")
                     .getJSONArray("children");
             getCommentsRecursive(comments, children, startingDepth);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch(Exception e){ e.printStackTrace(); }
         return comments;
     }
 
@@ -64,7 +65,7 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
             //getCommentsRecursive(moreComments, things, startingDepth);
             //Can't call getCommentsRecursive here because reddit handles
             //moreChildren calls differently than regular comments for some reason
-            for(int i = 0; i < things.length(); i++) {
+            for (int i = 0; i < things.length(); i++) {
                 JSONObject commentData = things.getJSONObject(i)
                         .getJSONObject("data");
                 RedditComment currentComment = new RedditComment();
@@ -72,15 +73,15 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
                 currentComment.setParentId(commentData.getString("parent_id"));
                 //Calculate depth
                 currentComment.setDepth(startingDepth);
-                for(RedditComment rc : moreComments) {
+                for (RedditComment rc : moreComments) {
                     //TODO: find out why this throws exceptions sometimes
-                    if(rc.getName().equals(currentComment.getParentId())){
+                    if (rc.getName().equals(currentComment.getParentId())) {
                         currentComment.setDepth(rc.getDepth() + 1);
                     }
                 }
 
                 //Handle "more comments" objects
-                if(things.getJSONObject(i).optString("kind").equals("more")) {
+                if (things.getJSONObject(i).optString("kind").equals("more")) {
                     currentComment.setUser("more");
                     currentComment.setMoreChildren(JSONArrayConverter
                             .convert(commentData.getJSONArray("children")));
@@ -110,13 +111,13 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
     //Recursively populates the main list with comments
     private void getCommentsRecursive(List<RedditComment> comments, JSONArray children, int depth) {
         try {
-            for(int i = 0; i < children.length(); i++) {
+            for (int i = 0; i < children.length(); i++) {
                 JSONObject commentData = children.getJSONObject(i)
                         .getJSONObject("data");
                 RedditComment currentComment = new RedditComment();
 
                 //Handle "more comments" objects
-                if(children.getJSONObject(i).optString("kind").equals("more")) {
+                if (children.getJSONObject(i).optString("kind").equals("more")) {
                     currentComment.setUser("more");
                     currentComment.setMoreChildren(JSONArrayConverter
                             .convert(commentData.getJSONArray("children")));
@@ -137,16 +138,17 @@ public class CommentFetcher extends ListFetcher<RedditComment> {
 
                 currentComment.setDepth(startingDepth + depth);
 
-                if(currentComment.getUser() == null) continue;
+                if (currentComment.getUser() == null) continue;
                 comments.add(currentComment);
 
-                if(commentData.get("replies").equals("")) continue;
+                if (commentData.get("replies").equals("")) continue;
                 JSONArray replies = commentData.getJSONObject("replies")
                         .getJSONObject("data").getJSONArray("children");
                 getCommentsRecursive(comments, replies, startingDepth + depth + 1);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch(Exception e) { e.printStackTrace(); }
     }
 
     @Override

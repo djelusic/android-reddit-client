@@ -37,6 +37,7 @@ import java.util.List;
 
 /**
 * Fragment that displays fetched comments
+ * TODO: remove this after RecyclerView refactor is finished
 * */
 public class CommentsFragment extends ListFragment<RedditComment>{
 

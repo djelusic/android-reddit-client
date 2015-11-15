@@ -29,9 +29,9 @@ import com.rael.daniel.drc.fragments.SubredditsRecyclerFragment;
 import com.rael.daniel.drc.reddit_login.RedditLogin;
 
 /**
-* Main activity, mostly acts as a container for fragments and
-* global UI elements.
-* */
+ * Main activity, mostly acts as a container for fragments and
+ * global UI elements.
+ */
 public class MainActivity extends AppCompatActivity implements IFragmentCallback {
     private Toolbar toolbar;
     private ActionBarDrawerToggle drawerToggle;
@@ -39,22 +39,21 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
     private DrawerLayout drawerLayout;
     private boolean stateChanged = false;
 
-    public FloatingActionButton getFAB() {
-        return (FloatingActionButton)findViewById(R.id.main_fab);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //setup toolbar and navigation drawer
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         drawerLayout = (DrawerLayout)
                 findViewById(R.id.drawer_layout);
-        navDrawer =  (NavigationView) findViewById(R.id.navigation);
+        navDrawer = (NavigationView) findViewById(R.id.navigation);
         setupDrawerContent(navDrawer);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-                toolbar, R.string.drawer_open,  R.string.drawer_close);
+                toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);
 
         addFragment(savedInstanceState);
@@ -63,19 +62,19 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
         getSupportFragmentManager().addOnBackStackChangedListener(
                 new FragmentManager.OnBackStackChangedListener() {
                     public void onBackStackChanged() {
-                        int backStackCount =  getSupportFragmentManager()
+                        int backStackCount = getSupportFragmentManager()
                                 .getBackStackEntryCount();
-                        if(backStackCount == 0) return;
+                        if (backStackCount == 0) return;
                         FragmentManager.BackStackEntry backEntry =
                                 getSupportFragmentManager()
-                                        .getBackStackEntryAt(backStackCount-1);
+                                        .getBackStackEntryAt(backStackCount - 1);
                         setTitle(backEntry.getName());
                     }
                 });
     }
 
 
-
+    //set onclick listener for nav drawer
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -87,15 +86,20 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
                 });
     }
 
+    //attempts to refresh top fragment on backstack
     public void refreshTopFragment() {
         FragmentManager.BackStackEntry backEntry =
                 getSupportFragmentManager().getBackStackEntryAt(
                         getSupportFragmentManager().getBackStackEntryCount() - 1);
-        String str=backEntry.getName();
-        Fragment fragment=getSupportFragmentManager().findFragmentByTag(str);
-        if(fragment instanceof RecyclerFragment) {
+        String str = backEntry.getName();
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(str);
+        if (fragment instanceof RecyclerFragment) {
             ((RecyclerFragment) fragment).myRefresh();
         }
+    }
+
+    public FloatingActionButton getFAB() {
+        return (FloatingActionButton) findViewById(R.id.main_fab);
     }
 
     //Handles navigation drawer item selection
@@ -103,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
         Fragment fragment = null;
         String name = null;
 
-        switch(menuItem.getItemId()) {
+        switch (menuItem.getItemId()) {
             case R.id.drawer_frontpage:
                 fragment = PostsRecyclerFragment.newInstance(this, null, null, null, true);
                 name = "Front";
@@ -134,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
         }
 
         // Replace current fragment
-        if(fragment != null) {
+        if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragments_container, fragment, name)
                     .addToBackStack(name).commit();
@@ -146,11 +150,11 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(new RedditLogin(getApplicationContext()).isLoggedIn()) {
+        //Toggle visibility of login/logout buttons in nav drawer
+        if (new RedditLogin(getApplicationContext()).isLoggedIn()) {
             navDrawer.getMenu().findItem(R.id.drawer_login).setVisible(false);
             navDrawer.getMenu().findItem(R.id.drawer_logout).setVisible(true);
-        }
-        else {
+        } else {
             navDrawer.getMenu().findItem(R.id.drawer_login).setVisible(true);
             navDrawer.getMenu().findItem(R.id.drawer_logout).setVisible(false);
         }
@@ -167,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK && new RedditLogin(getApplicationContext()).isLoggedIn()) {
+        if (resultCode == RESULT_OK && new RedditLogin(getApplicationContext()).isLoggedIn()) {
             navDrawer.getMenu().findItem(R.id.drawer_login).setVisible(false);
             navDrawer.getMenu().findItem(R.id.drawer_logout).setVisible(true);
             refreshTopFragment();
@@ -190,8 +194,9 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
         return super.onOptionsItemSelected(item);
     }
 
-    void addFragment(Bundle savedInstanceState){
-        if(savedInstanceState == null) {
+    //Used to add initial fragment when app is launched
+    void addFragment(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.fragments_container
@@ -212,14 +217,14 @@ public class MainActivity extends AppCompatActivity implements IFragmentCallback
 
     @Override
     public FloatingActionButton getSubFAB(int position) {
-        if(position == 0) {
-            return (FloatingActionButton)findViewById(R.id.sub_fab_first);
+        if (position == 0) {
+            return (FloatingActionButton) findViewById(R.id.sub_fab_first);
         }
-        if(position == 1) {
-            return (FloatingActionButton)findViewById(R.id.sub_fab_second);
+        if (position == 1) {
+            return (FloatingActionButton) findViewById(R.id.sub_fab_second);
         }
-        if(position == 2) {
-            return (FloatingActionButton)findViewById(R.id.sub_fab_third);
+        if (position == 2) {
+            return (FloatingActionButton) findViewById(R.id.sub_fab_third);
         }
         return null;
     }

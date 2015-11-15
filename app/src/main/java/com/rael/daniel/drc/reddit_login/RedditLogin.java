@@ -12,8 +12,9 @@ import org.json.JSONObject;
 import java.net.HttpURLConnection;
 
 /**
-* Implementation of the Reddit login API
-* */
+ * Implementation of the Reddit login API
+ * TODO: Add OAuth2
+ */
 public class RedditLogin {
 
     //Session cookie
@@ -25,21 +26,20 @@ public class RedditLogin {
     }
 
     //Attempts to send login data and receive the session cookie
-    private String getCookie(String url, String data){
+    private String getCookie(String url, String data) {
         RedditConnectionManager rcm =
                 new RedditConnectionManager(applicationContext);
-        HttpURLConnection con=rcm.getConnection(url);
+        HttpURLConnection con = rcm.getConnection(url);
         con.setDoOutput(true);
-        if(rcm.postRequest(con, data) != null) {
+        if (rcm.postRequest(con, data) != null) {
             redditCookie = con.getHeaderField("set-cookie");
             return redditCookie;
-        }
-        else return null;
+        } else return null;
     }
 
     //Modhash is required for some API calls (eg Vote)
     private String getModhash() {
-        if(isLoggedIn()) {
+        if (isLoggedIn()) {
             RedditConnectionManager rcm =
                     new RedditConnectionManager(applicationContext);
             try {
@@ -51,33 +51,34 @@ public class RedditLogin {
                                 Context.MODE_PRIVATE).edit();
                 edit.putString("Modhash", modhash).apply();
                 return modhash;
+            } catch (Exception e) {
+                return null;
             }
-            catch(Exception e) { return null;}
-        }
-        else return null;
+        } else return null;
 
     }
 
     //Main login method, stores the session cookie and modhash
     //in shared preferences
-    public boolean login(String username, String password){
+    //TODO: Make this static
+    public boolean login(String username, String password) {
 
         RedditConnectionManager conn =
                 new RedditConnectionManager(applicationContext);
 
-        String data="user="+username+"&passwd="+password;
+        String data = "user=" + username + "&passwd=" + password;
 
         String cookie = getCookie(Consts.REDDIT_LOGIN_URL, data);
 
-        if(cookie==null)
+        if (cookie == null)
             return false;
 
-        cookie=cookie.split(";")[0];
-        if(cookie.startsWith("reddit_first")){
+        cookie = cookie.split(";")[0];
+        if (cookie.startsWith("reddit_first")) {
             // Login failed
             Log.d("Error", "Unable to login.");
             return false;
-        }else if(cookie.startsWith("reddit_session")){
+        } else if (cookie.startsWith("reddit_session")) {
             // Login success
             Log.d("Success", cookie);
             redditCookie = cookie;

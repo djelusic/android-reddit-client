@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Fetches more comments in background and adds them to the main list
  */
-public class GetMoreCommentsTask extends AsyncTask<Void, Void, List<RedditComment> > {
+public class GetMoreCommentsTask extends AsyncTask<Void, Void, List<RedditComment>> {
 
     private final String API_URL =
             Consts.REDDIT_URL + "/api/morechildren.json";
@@ -27,7 +27,7 @@ public class GetMoreCommentsTask extends AsyncTask<Void, Void, List<RedditCommen
     private int position;
 
     public GetMoreCommentsTask(CommentsFragment commentsFragment,
-                        String link_id, int position) {
+                               String link_id, int position) {
         this.applicationContext = commentsFragment.getContext();
         this.commentsFragment = commentsFragment;
         this.comments = commentsFragment.getList();
@@ -46,7 +46,7 @@ public class GetMoreCommentsTask extends AsyncTask<Void, Void, List<RedditCommen
         url.append("&children=");
         for (int i = 0; i < children.length; i++) {
             url.append(children[i]);
-            if(i < children.length - 1)
+            if (i < children.length - 1)
                 url.append(",");
         }
         String rawResponse = rcm.readContents(url.toString());

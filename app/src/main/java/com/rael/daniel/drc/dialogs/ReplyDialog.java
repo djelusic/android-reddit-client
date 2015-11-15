@@ -11,6 +11,7 @@ import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 
 /**
  * Simple dialog for replying to comments
+ * TODO: add error checking
  */
 public class ReplyDialog extends Dialog{
     String parentId;

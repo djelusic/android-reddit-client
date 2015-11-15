@@ -10,12 +10,10 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.rael.daniel.drc.R;
-import com.rael.daniel.drc.activities.MainActivity;
 import com.rael.daniel.drc.fragments.PostsRecyclerFragment;
-import com.rael.daniel.drc.reddit_api.RedditAPICommon;
 
 /**
- * Created by Daniel on 11/11/2015.
+ * Dialog for subreddit access from navigation drawer
  */
 public class SubredditSearchDialog extends Dialog {
     Context applicationContext;

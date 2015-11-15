@@ -38,17 +38,16 @@ public class RedditAPICommon {
         @Override
         protected String doInBackground(Void... params) {
             RedditLogin rl = new RedditLogin(applicationContext);
-            if(rl.isLoggedIn()) {
+            if (rl.isLoggedIn()) {
                 RedditConnectionManager rcm = new RedditConnectionManager(applicationContext);
                 return rcm.postRequest(rcm.getConnection(Consts.REDDIT_URL + "/api/vote"), body);
-            }
-            else return null;
+            } else return null;
         }
 
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if(result.startsWith("HTTP error"))
+            if (result.startsWith("HTTP error"))
                 Toast.makeText(applicationContext, result +
                         ". Reddit is most likely down.", Toast.LENGTH_LONG).show();
         }
@@ -66,37 +65,36 @@ public class RedditAPICommon {
         @Override
         protected String doInBackground(Void... params) {
             RedditLogin rl = new RedditLogin(applicationContext);
-            if(rl.isLoggedIn()) {
+            if (rl.isLoggedIn()) {
                 RedditConnectionManager rcm = new RedditConnectionManager(applicationContext);
                 return rcm.postRequest(rcm.getConnection(Consts.REDDIT_URL + "/api/submit"),
                         body);
-            }
-            else return null;
+            } else return null;
         }
 
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if(result.startsWith("HTTP error"))
+            if (result.startsWith("HTTP error"))
                 Toast.makeText(applicationContext, result +
                         ". Reddit is most likely down.", Toast.LENGTH_LONG).show();
-            else if(result.contains("BAD_CAPTCHA")) {
+            else if (result.contains("BAD_CAPTCHA")) {
                 Log.d("Submit", "Need captcha");
                 try {
                     JSONObject response = new JSONObject(result)
                             .getJSONObject("json");
                     String captchaId = response.getString("captcha");
-                    ImageView captchaImg = (ImageView)sa
+                    ImageView captchaImg = (ImageView) sa
                             .findViewById(R.id.captcha_img);
                     sa.findViewById(R.id.captcha_img).setTag(captchaId);
                     new DownloadImageTask(captchaImg)
                             .execute(Consts.REDDIT_URL + "/captcha/" + captchaId + ".png");
                     captchaImg.setVisibility(View.VISIBLE);
                     sa.findViewById(R.id.captcha_input).setVisibility(View.VISIBLE);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                catch(Exception e) { e.printStackTrace(); }
-            }
-            else {
+            } else {
                 Log.d("Submit", "success");
                 sa.finish();
             }
@@ -113,18 +111,17 @@ public class RedditAPICommon {
         @Override
         protected String doInBackground(Void... params) {
             RedditLogin rl = new RedditLogin(applicationContext);
-            if(rl.isLoggedIn()) {
+            if (rl.isLoggedIn()) {
                 RedditConnectionManager rcm = new RedditConnectionManager(applicationContext);
                 return rcm.postRequest(rcm.getConnection(Consts.REDDIT_URL
-                                + "/api/comment"), body);
-            }
-            else return null;
+                        + "/api/comment"), body);
+            } else return null;
         }
 
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if(result.startsWith("HTTP error"))
+            if (result.startsWith("HTTP error"))
                 Toast.makeText(applicationContext, result +
                         ". Reddit is most likely down.", Toast.LENGTH_LONG).show();
         }
@@ -138,31 +135,31 @@ public class RedditAPICommon {
 
     public void submit(String sr, String kind, SubmitActivity sa) {
         View captchaImg = sa.findViewById(R.id.captcha_img);
-        String title = ((EditText)sa.findViewById(R.id.submit_title))
+        String title = ((EditText) sa.findViewById(R.id.submit_title))
                 .getText().toString();
-        String text = ((EditText)sa.findViewById(R.id.submit_text))
+        String text = ((EditText) sa.findViewById(R.id.submit_text))
                 .getText().toString();
-        String url = ((EditText)sa.findViewById(R.id.submit_url))
+        String url = ((EditText) sa.findViewById(R.id.submit_url))
                 .getText().toString();
         String captchaHeader = "";
-        if(captchaImg.getVisibility() == View.VISIBLE) {
-            captchaHeader = "&iden=" + (String)captchaImg.getTag()
-                    + "&captcha=" + ((EditText)sa.findViewById(R.id.captcha_input))
+        if (captchaImg.getVisibility() == View.VISIBLE) {
+            captchaHeader = "&iden=" + (String) captchaImg.getTag()
+                    + "&captcha=" + ((EditText) sa.findViewById(R.id.captcha_input))
                     .getText().toString();
         }
-        if(kind.equals("link"))
+        if (kind.equals("link"))
             new SubmitTask("kind=" + kind + "&sr=" + sr + "&title="
                     + title + "&url=" + url + "&api_type=json" +
-                    captchaHeader, sa).execute((Void)null);
-        if(kind.equals("self"))
+                    captchaHeader, sa).execute((Void) null);
+        if (kind.equals("self"))
             new SubmitTask("kind=" + kind + "&sr=" + sr + "&title="
                     + title + "&text=" + text + "&api_type=json"
-                    + captchaHeader, sa).execute((Void)null);
+                    + captchaHeader, sa).execute((Void) null);
     }
 
     public void reply(String parentId, String replyText) {
         ReplyTask tsk = new ReplyTask("thing_id=" + parentId +
                 "&text=" + replyText + "&api_type=json");
-        tsk.execute((Void)null);
+        tsk.execute((Void) null);
     }
 }

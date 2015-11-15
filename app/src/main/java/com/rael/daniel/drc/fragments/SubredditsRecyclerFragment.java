@@ -17,7 +17,7 @@ import com.rael.daniel.drc.reddit_fetchers.SubredditFetcher;
 import com.rael.daniel.drc.reddit_objects.RedditSubreddit;
 
 /**
- * Created by Daniel on 12/10/2015.
+ * Fragment that displays fetched list of subscribed/default subreddits.
  */
 public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit> {
 
@@ -40,14 +40,14 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Hide fab, might implement something later
-        if(fragmentCallback != null) {
+        if (fragmentCallback != null) {
             fragmentCallback.getFAB().setVisibility(View.GONE);
         }
     }
 
-    public static Fragment newInstance(Context applicationContext){
-        SubredditsRecyclerFragment sf=new SubredditsRecyclerFragment();
-        sf.lFetcher =new SubredditFetcher(applicationContext);
+    public static Fragment newInstance(Context applicationContext) {
+        SubredditsRecyclerFragment sf = new SubredditsRecyclerFragment();
+        sf.lFetcher = new SubredditFetcher(applicationContext);
         return sf;
     }
 
@@ -63,7 +63,7 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
         super.onCreateOptionsMenu(menu, inflater);
         menu.setGroupVisible(R.id.sort_posts, false);
         menu.setGroupVisible(R.id.sort_comments, false);
-        final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
+        final SearchView sv = (SearchView) menu.findItem(R.id.action_search)
                 .getActionView();
         sv.setQueryHint("Enter a subreddit manually");
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -109,7 +109,7 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
                                 .beginTransaction()
                                 .replace(R.id.fragments_container, sf, clickedSubreddit)
                                 .addToBackStack(clickedSubreddit)
-                                //.addSharedElement(contentView.findViewById(R.id.subreddit_item), "sub_post_transition")
+                                        //.addSharedElement(contentView.findViewById(R.id.subreddit_item), "sub_post_transition")
                                 .commit();
                     }
                 });

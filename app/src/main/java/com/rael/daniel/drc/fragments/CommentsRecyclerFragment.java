@@ -18,7 +18,7 @@ import com.rael.daniel.drc.reddit_objects.RedditComment;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
 
 /**
- * Created by Daniel on 05/11/2015.
+ * Fragment that displays fetched comments
  */
 public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
     String url;
@@ -57,6 +57,7 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
         super.onAttach(context);
         setFABIcon(fragmentCallback.getSubFAB(1),
                 R.drawable.ic_keyboard_arrow_down_black_24dp);
+        //Setup comment navigation
         setSubFABOnClickListener(1, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,16 +88,6 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
                 }
             }
         });
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        if(new RedditLogin(getContext()).isLoggedIn()) {
-            menu.add("Upvote");
-            menu.add("Downvote");
-            menu.add("Reply");
-        }
     }
 
     @Override
@@ -159,52 +150,6 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
             return true;
         }
     }
-
-    //Upvote/downvote functionality
-    /*@Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info =
-                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        RedditComment clickedComment;
-        if(info.position == 0) {
-            clickedComment = link;
-            ((MainActivity)getActivity()).setStateChanged(true);
-        }
-        else clickedComment = getList().get(info.position);
-        if(item.getTitle() == "Upvote") {
-            new RedditAPICommon(getActivity().getApplicationContext())
-                    .vote(clickedComment.getName(), 1);
-            //Change color of score to orange after upvoting
-            //TODO: integrate this into VoteTask
-            View scoreView = rView.getChildAt(info.position -
-                    rView.getFirstVisiblePosition())
-                    .findViewById(R.id.comment_score);
-            ((TextView)scoreView).setTextColor(ContextCompat
-                    .getColor(getContext(), R.color.upvoteOrange));
-            ((TextView)scoreView).setText(String.valueOf(Integer
-                    .valueOf(clickedComment.getScore()) + 1));
-        }
-        else if(item.getTitle() == "Downvote") {
-            new RedditAPICommon(getActivity().getApplicationContext())
-                    .vote(clickedComment.getName(), -1);
-            //Change color of score to blue after downvoting
-            //TODO: integrate this into VoteTask
-            View scoreView = rView.getChildAt(info.position -
-                    rView.getFirstVisiblePosition())
-                    .findViewById(R.id.comment_score);
-            ((TextView)scoreView).setTextColor(ContextCompat
-                    .getColor(getContext(), R.color.downvoteBlue));
-            ((TextView)scoreView).setText(String.valueOf(Integer
-                    .valueOf(clickedComment.getScore()) - 1));
-        }
-        else if(item.getTitle() == "Reply") {
-            Bundle params = new Bundle();
-            params.putString("parent_id", clickedComment.getName());
-            ReplyDialog rd = new ReplyDialog(getActivity(), params);
-            rd.show();
-        }
-        return true;
-    }*/
 
     @Override
     protected void createAndBindAdapter() {

@@ -1,4 +1,5 @@
 package com.rael.daniel.drc.util;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;

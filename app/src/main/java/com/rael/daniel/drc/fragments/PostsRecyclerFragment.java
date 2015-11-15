@@ -30,9 +30,9 @@ import com.rael.daniel.drc.reddit_objects.RedditPost;
 import com.rael.daniel.drc.util.Consts;
 
 /**
- * Created by Daniel on 05/11/2015.
+ * Fragment that displays fetched posts
  */
-public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
+public class PostsRecyclerFragment extends RecyclerFragment<RedditPost> {
     private String subreddit;
     private String sortingType;
     private String requestBody;
@@ -45,12 +45,12 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
     }
 
     public String createUrl() {
-        if(subreddit == null) { //Frontpage
-            if(sortingType == null) return Consts.REDDIT_URL;
+        if (subreddit == null) { //Frontpage
+            if (sortingType == null) return Consts.REDDIT_URL;
             return Consts.REDDIT_URL + "/" + sortingType;
         }
-        if(requestBody == null) { //Regular subreddit post listing
-            if(sortingType == null) return Consts.REDDIT_URL +
+        if (requestBody == null) { //Regular subreddit post listing
+            if (sortingType == null) return Consts.REDDIT_URL +
                     "/r/" + subreddit;
             return Consts.REDDIT_URL + "/r/" +
                     subreddit + "/" + sortingType;
@@ -73,12 +73,12 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
 
     public static Fragment newInstance(Context applicationContext,
                                        String subreddit, String requestBody,
-                                       String sortingType, boolean showSubreddit){
-        PostsRecyclerFragment pf=new PostsRecyclerFragment();
-        pf.subreddit =subreddit;
-        pf.requestBody =requestBody;
-        pf.sortingType =sortingType;
-        pf.lFetcher =new PostFetcher(applicationContext, pf.createUrl());
+                                       String sortingType, boolean showSubreddit) {
+        PostsRecyclerFragment pf = new PostsRecyclerFragment();
+        pf.subreddit = subreddit;
+        pf.requestBody = requestBody;
+        pf.sortingType = sortingType;
+        pf.lFetcher = new PostFetcher(applicationContext, pf.createUrl());
         pf.showSubreddit = showSubreddit;
         return pf;
     }
@@ -101,7 +101,7 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
         super.onCreateOptionsMenu(menu, inflater);
         menu.setGroupVisible(R.id.sort_posts, true);
         menu.setGroupVisible(R.id.sort_comments, false);
-        final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
+        final SearchView sv = (SearchView) menu.findItem(R.id.action_search)
                 .getActionView();
 
         sv.setQueryHint("Search this subreddit");
@@ -132,14 +132,20 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
 
     private int getSortTypeId(String sortingType) {
         //default sorting type is hot
-        if(sortingType == null) return 0;
-        switch(sortingType) {
-            case "hot" : return 0;
-            case "new" : return 1;
-            case "rising" : return 2;
-            case "controversial" : return 3;
-            case "top" : return 4;
-            default : return 0;
+        if (sortingType == null) return 0;
+        switch (sortingType) {
+            case "hot":
+                return 0;
+            case "new":
+                return 1;
+            case "rising":
+                return 2;
+            case "controversial":
+                return 3;
+            case "top":
+                return 4;
+            default:
+                return 0;
         }
     }
 
@@ -153,7 +159,7 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(super.onOptionsItemSelected(item))
+        if (super.onOptionsItemSelected(item))
             return true;
         switch (item.getItemId()) {
             case R.id.sort_posts_hot:
@@ -192,101 +198,100 @@ public class PostsRecyclerFragment extends  RecyclerFragment<RedditPost> {
         adapter = new PostsRecyclerAdapter(getContext(),
                 getList(), item_layout_id, rView, showSubreddit,
                 new RedditRecyclerAdapter.ViewHolder.IViewHolderClick() {
-            @Override
-            public void onClick(View v, int position) {
-                PostsRecyclerAdapter.PostViewHolder holder = (PostsRecyclerAdapter.PostViewHolder)v.getTag();
-                switch(v.getId()) {
-                    case R.id.upvote_arrow:
-                        if(!new RedditLogin(getContext()).isLoggedIn()) {
-                            Toast.makeText(getContext(), "Need to be logged in to vote.",
-                                    Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        new RedditAPICommon(getContext())
-                                .vote(getList().get(position).getName(), 1);
-                        holder.upvoteArrow.setColorFilter(ContextCompat
-                                .getColor(getContext(), R.color.upvoteOrange));
-                        holder.downvoteArrow.setColorFilter(ContextCompat
-                                .getColor(getContext(), android.R.color.darker_gray));
-                        holder.postScore.setTextColor(ContextCompat
-                                .getColor(getContext(), R.color.upvoteOrange));
-                    case R.id.downvote_arrow:
-                        if(!new RedditLogin(getContext()).isLoggedIn()) {
-                            Toast.makeText(getContext(), "Need to be logged in to vote.",
-                                    Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        new RedditAPICommon(getContext())
-                                .vote(getList().get(position).getName(), -1);
-                        holder.downvoteArrow.setColorFilter(ContextCompat
-                                .getColor(getContext(), R.color.downvoteBlue));
-                        holder.upvoteArrow.setColorFilter(ContextCompat
-                                .getColor(getContext(), android.R.color.darker_gray));
-                        holder.postScore.setTextColor(ContextCompat
-                                .getColor(getContext(), R.color.downvoteBlue));
-                    case R.id.link_thumbnail:
-                        if(getList().get(position).getUrl().endsWith("jpg")) {
-                            ImageFragment imf =
-                                    (ImageFragment) ImageFragment.newInstance(
-                                            getContext(), getList().get(position).getUrl());
-                            ((AppCompatActivity) getContext()).getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .replace(R.id.fragments_container, imf, "Image")
-                                    .addToBackStack("Image")
-                                    .commit();
-                        }
-                        else {
-                            Fragment wvf =
-                                    ImprovedWebViewFragment.newInstance(
-                                            getList().get(position).getUrl());
-                            ((AppCompatActivity) getContext()).getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .replace(R.id.fragments_container, wvf, "Web")
-                                    .addToBackStack("Web")
-                                    .commit();
-                        }
-                        return;
-                    case R.id.browser_image:
-                        Fragment wvf =
-                                ImprovedWebViewFragment.newInstance(
-                                        getList().get(position).getUrl());
-                        ((AppCompatActivity) getContext()).getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fragments_container, wvf, "Web")
-                                .addToBackStack("Web")
-                                .commit();
-                        return;
-                    default:
-                        RedditLogin rl = new RedditLogin(getContext());
-                        if(rl.isLoggedIn()) {
-                            SharedPreferences.Editor edit = getContext()
-                                    .getSharedPreferences(Consts.SPREFS_READ_POSTS + rl.getCurrentUser(),
-                                            Context.MODE_PRIVATE).edit();
-                            edit.putString(getList().get(position).getName(), "true").apply();
-                        }
-                        setSharedElementReturnTransition(TransitionInflater
-                                .from(getActivity()).inflateTransition(R.transition.test_transition));
+                    @Override
+                    public void onClick(View v, int position) {
+                        PostsRecyclerAdapter.PostViewHolder holder = (PostsRecyclerAdapter.PostViewHolder) v.getTag();
+                        switch (v.getId()) {
+                            case R.id.upvote_arrow:
+                                if (!new RedditLogin(getContext()).isLoggedIn()) {
+                                    Toast.makeText(getContext(), "Need to be logged in to vote.",
+                                            Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                new RedditAPICommon(getContext())
+                                        .vote(getList().get(position).getName(), 1);
+                                holder.upvoteArrow.setColorFilter(ContextCompat
+                                        .getColor(getContext(), R.color.upvoteOrange));
+                                holder.downvoteArrow.setColorFilter(ContextCompat
+                                        .getColor(getContext(), android.R.color.darker_gray));
+                                holder.postScore.setTextColor(ContextCompat
+                                        .getColor(getContext(), R.color.upvoteOrange));
+                            case R.id.downvote_arrow:
+                                if (!new RedditLogin(getContext()).isLoggedIn()) {
+                                    Toast.makeText(getContext(), "Need to be logged in to vote.",
+                                            Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                new RedditAPICommon(getContext())
+                                        .vote(getList().get(position).getName(), -1);
+                                holder.downvoteArrow.setColorFilter(ContextCompat
+                                        .getColor(getContext(), R.color.downvoteBlue));
+                                holder.upvoteArrow.setColorFilter(ContextCompat
+                                        .getColor(getContext(), android.R.color.darker_gray));
+                                holder.postScore.setTextColor(ContextCompat
+                                        .getColor(getContext(), R.color.downvoteBlue));
+                            case R.id.link_thumbnail:
+                                if (getList().get(position).getUrl().endsWith("jpg")) {
+                                    ImageFragment imf =
+                                            (ImageFragment) ImageFragment.newInstance(
+                                                    getContext(), getList().get(position).getUrl());
+                                    ((AppCompatActivity) getContext()).getSupportFragmentManager()
+                                            .beginTransaction()
+                                            .replace(R.id.fragments_container, imf, "Image")
+                                            .addToBackStack("Image")
+                                            .commit();
+                                } else {
+                                    Fragment wvf =
+                                            ImprovedWebViewFragment.newInstance(
+                                                    getList().get(position).getUrl());
+                                    ((AppCompatActivity) getContext()).getSupportFragmentManager()
+                                            .beginTransaction()
+                                            .replace(R.id.fragments_container, wvf, "Web")
+                                            .addToBackStack("Web")
+                                            .commit();
+                                }
+                                return;
+                            case R.id.browser_image:
+                                Fragment wvf =
+                                        ImprovedWebViewFragment.newInstance(
+                                                getList().get(position).getUrl());
+                                ((AppCompatActivity) getContext()).getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.fragments_container, wvf, "Web")
+                                        .addToBackStack("Web")
+                                        .commit();
+                                return;
+                            default:
+                                RedditLogin rl = new RedditLogin(getContext());
+                                if (rl.isLoggedIn()) {
+                                    SharedPreferences.Editor edit = getContext()
+                                            .getSharedPreferences(Consts.SPREFS_READ_POSTS + rl.getCurrentUser(),
+                                                    Context.MODE_PRIVATE).edit();
+                                    edit.putString(getList().get(position).getName(), "true").apply();
+                                }
+                                setSharedElementReturnTransition(TransitionInflater
+                                        .from(getActivity()).inflateTransition(R.transition.test_transition));
                         /*setExitTransition(TransitionInflater.from(getActivity())
                                 .inflateTransition(android.R.transition.explode));*/
-                        String postUrl = Consts.REDDIT_URL + getList().get(position).getPermalink() + ".json";
-                        Fragment cf = CommentsRecyclerFragment.newInstance(getContext(),
-                                postUrl, getList().get(position));
-                        cf.setSharedElementEnterTransition(TransitionInflater
-                                .from(getActivity()).inflateTransition(R.transition.test_transition));
+                                String postUrl = Consts.REDDIT_URL + getList().get(position).getPermalink() + ".json";
+                                Fragment cf = CommentsRecyclerFragment.newInstance(getContext(),
+                                        postUrl, getList().get(position));
+                                cf.setSharedElementEnterTransition(TransitionInflater
+                                        .from(getActivity()).inflateTransition(R.transition.test_transition));
                         /*cf.setEnterTransition(TransitionInflater.from(getActivity())
                                 .inflateTransition(android.R.transition.explode));*/
 
-                        v.findViewById(R.id.post_item_layout).setTransitionName("post_comment");
-                        getActivity().getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fragments_container, cf)
-                                .addToBackStack("Comments")
-                                .addSharedElement(v.findViewById(R.id.post_item_layout),
-                                        "post_comment")
-                                .commit();
-                }
-            }
-        });
+                                v.findViewById(R.id.post_item_layout).setTransitionName("post_comment");
+                                getActivity().getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.fragments_container, cf)
+                                        .addToBackStack("Comments")
+                                        .addSharedElement(v.findViewById(R.id.post_item_layout),
+                                                "post_comment")
+                                        .commit();
+                        }
+                    }
+                });
         rView.setAdapter(adapter);
     }
 

@@ -19,18 +19,19 @@ import com.rael.daniel.drc.util.Consts;
 
 import java.util.List;
 
+//TODO: remove this after RecyclerView refactor is finished
 public class SubredditsFragment extends ListFragment<RedditSubreddit> {
 
-    public SubredditsFragment(){
+    public SubredditsFragment() {
         super();
         layout_id = R.layout.subreddit_list_layout;
         item_layout_id = R.layout.subreddit_item_layout;
         list_id = R.id.subreddit_list;
     }
 
-    public static Fragment newInstance(Context applicationContext){
-        SubredditsFragment sf=new SubredditsFragment();
-        sf.lFetcher =new SubredditFetcher(applicationContext);
+    public static Fragment newInstance(Context applicationContext) {
+        SubredditsFragment sf = new SubredditsFragment();
+        sf.lFetcher = new SubredditFetcher(applicationContext);
         return sf;
     }
 
@@ -53,14 +54,14 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
+        final SearchView sv = (SearchView) menu.findItem(R.id.action_search)
                 .getActionView();
         sv.setQueryHint("Enter a subreddit manually");
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Fragment sf = PostsRecyclerFragment.newInstance(getActivity()
-                        .getApplicationContext(),
+                                .getApplicationContext(),
                         query, null, null, false);
 
                 getFragmentManager().beginTransaction()
@@ -79,13 +80,13 @@ public class SubredditsFragment extends ListFragment<RedditSubreddit> {
     }
 
     View fillItems(List<RedditSubreddit> subreddits, View convertView, int position) {
-        if(convertView == null)
-            convertView=getActivity()
+        if (convertView == null)
+            convertView = getActivity()
                     .getLayoutInflater()
                     .inflate(item_layout_id, null);
-        ((TextView)convertView.findViewById(R.id.subreddit_title))
+        ((TextView) convertView.findViewById(R.id.subreddit_title))
                 .setText(subreddits.get(position).getUrl());
-        ((TextView)convertView.findViewById(R.id.subreddit_description))
+        ((TextView) convertView.findViewById(R.id.subreddit_description))
                 .setText(subreddits.get(position).getTitle());
         return convertView;
     }

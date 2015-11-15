@@ -17,7 +17,7 @@ public class ImgurGalleryFetcher {
     public static String getGalleryId(String url) {
         String tail = url.substring(url.lastIndexOf('/') + 1,
                 url.length());
-        if(!tail.contains(".")) return tail;
+        if (!tail.contains(".")) return tail;
         else return tail.substring(0, tail.lastIndexOf('.'));
     }
 
@@ -31,7 +31,7 @@ public class ImgurGalleryFetcher {
         try {
             JSONObject data = new JSONObject(jsonResponse)
                     .getJSONObject("data");
-            if(data.optString("is_album").equals("false")) {
+            if (data.optString("is_album").equals("false")) {
                 currentImage.setId(data.optString("id"));
                 currentImage.setTitle(data.optString("title"));
                 currentImage.setDescription(data.optString("description"));
@@ -39,18 +39,17 @@ public class ImgurGalleryFetcher {
                 currentImage.setHeight(data.optString("height"));
                 currentImage.setType(data.optString("type"));
                 currentImage.setLink(data.optString("link"));
-                if(getThumbnails) {
+                if (getThumbnails) {
                     currentImage.setLink(currentImage.getLink()
                             .replace(currentImage.getId(), currentImage.getId() + "s"));
                 }
                 imageList.add(currentImage);
                 return imageList;
-            }
-            else { //gallery is album
+            } else { //gallery is album
                 int albumSize = Integer.valueOf(data.getString("images_count"));
                 JSONArray albumData = data.getJSONArray("images");
                 JSONObject childImage;
-                for(int i = 0; i < albumSize; i++) {
+                for (int i = 0; i < albumSize; i++) {
                     childImage = albumData.getJSONObject(i);
                     currentImage.setId(childImage.optString("id"));
                     currentImage.setTitle(childImage.optString("title"));
@@ -59,7 +58,7 @@ public class ImgurGalleryFetcher {
                     currentImage.setHeight(childImage.optString("height"));
                     currentImage.setType(childImage.optString("type"));
                     currentImage.setLink(childImage.optString("link"));
-                    if(getThumbnails) {
+                    if (getThumbnails) {
                         currentImage.setLink(currentImage.getLink()
                                 .replace(currentImage.getId(), currentImage.getId() + "s"));
                     }

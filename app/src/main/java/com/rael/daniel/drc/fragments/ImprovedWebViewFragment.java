@@ -10,7 +10,7 @@ import android.webkit.WebView;
 
 /**
  * Credit to bencallis @stackoverflow
-* */
+ */
 public class ImprovedWebViewFragment extends Fragment {
 
     private WebView mWebView;
@@ -19,6 +19,7 @@ public class ImprovedWebViewFragment extends Fragment {
 
     /**
      * Creates a new fragment which loads the supplied url as soon as it can
+     *
      * @param url the url to load once initialised
      */
     public ImprovedWebViewFragment() {
@@ -48,11 +49,13 @@ public class ImprovedWebViewFragment extends Fragment {
 
     /**
      * Convenience method for loading a url. Will fail if {@link View} is not initialised (but won't throw an {@link Exception})
+     *
      * @param url
      */
     public void loadUrl(String url) {
         if (mIsWebViewAvailable) getWebView().loadUrl(mUrl = url);
-        else Log.w("ImprovedWebViewFragment", "WebView cannot be found. Check the view and fragment have been loaded.");
+        else
+            Log.w("ImprovedWebViewFragment", "WebView cannot be found. Check the view and fragment have been loaded.");
     }
 
     /**

@@ -8,7 +8,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class PicassoImgurThumbnailTask extends AsyncTask<Void, Void, Void>{
+public class PicassoImgurThumbnailTask extends AsyncTask<Void, Void, Void> {
     List<ImgurImage> imageList;
     ImageView iView;
     String galleryId;
@@ -31,7 +31,7 @@ public class PicassoImgurThumbnailTask extends AsyncTask<Void, Void, Void>{
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        if(imageList != null) {
+        if (imageList != null) {
             Picasso.with(applicationContext).load(imageList
                     .get(0).getLink()).fit().into(iView);
         }

@@ -27,7 +27,7 @@ public class ImageFragment extends Fragment {
                 , container
                 , false);
         Picasso.with(applicationContext).load(url)
-                .into((ImageView)v.findViewById(R.id.imgur_image));
+                .into((ImageView) v.findViewById(R.id.imgur_image));
         return v;
     }
 
@@ -35,8 +35,8 @@ public class ImageFragment extends Fragment {
         super();
     }
 
-    public static Fragment newInstance(Context applicationContext, String url){
-        ImageFragment cf=new ImageFragment();
+    public static Fragment newInstance(Context applicationContext, String url) {
+        ImageFragment cf = new ImageFragment();
         cf.applicationContext = applicationContext;
         cf.url = url;
         return cf;

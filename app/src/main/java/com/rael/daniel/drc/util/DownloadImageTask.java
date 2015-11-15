@@ -11,7 +11,7 @@ import java.io.InputStream;
 /**
  * Simple task for downloading images
  * Credit to Android Developer @StackOverflow
-* */
+ */
 
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     ImageView bmImage;

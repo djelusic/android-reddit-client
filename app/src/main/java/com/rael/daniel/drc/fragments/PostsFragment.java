@@ -29,6 +29,7 @@ import java.util.List;
 
 /**
  * Fragment that displays fetched posts
+ * TODO: remove this after RecyclerView refactor is finished
  */
 public class PostsFragment extends ListFragment<RedditPost> {
 
@@ -37,7 +38,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
     String sortingType;
     private boolean showSubreddit;
 
-    public PostsFragment(){
+    public PostsFragment() {
         super();
         layout_id = R.layout.post_list_layout;
         item_layout_id = R.layout.post_item_layout;
@@ -46,12 +47,12 @@ public class PostsFragment extends ListFragment<RedditPost> {
     }
 
     public String createUrl() {
-        if(subreddit == null) { //Frontpage
-            if(sortingType == null) return Consts.REDDIT_URL;
+        if (subreddit == null) { //Frontpage
+            if (sortingType == null) return Consts.REDDIT_URL;
             return Consts.REDDIT_URL + "/" + sortingType;
         }
-        if(requestBody == null) { //Regular subreddit post listing
-            if(sortingType == null) return Consts.REDDIT_URL +
+        if (requestBody == null) { //Regular subreddit post listing
+            if (sortingType == null) return Consts.REDDIT_URL +
                     "/r/" + subreddit;
             return Consts.REDDIT_URL + "/r/" +
                     subreddit + "/" + sortingType;
@@ -75,7 +76,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView sv = (SearchView)menu.findItem(R.id.action_search)
+        final SearchView sv = (SearchView) menu.findItem(R.id.action_search)
                 .getActionView();
         //final MenuItem submit = menu.findItem(R.id.submit_menu_item);
         //submit.setVisible(true);
@@ -153,12 +154,12 @@ public class PostsFragment extends ListFragment<RedditPost> {
 
     public static Fragment newInstance(Context applicationContext,
                                        String subreddit, String requestBody,
-                                       String sortingType, boolean showSubreddit){
-        PostsFragment pf=new PostsFragment();
-        pf.subreddit =subreddit;
-        pf.requestBody =requestBody;
-        pf.sortingType =sortingType;
-        pf.lFetcher =new PostFetcher(applicationContext, pf.createUrl());
+                                       String sortingType, boolean showSubreddit) {
+        PostsFragment pf = new PostsFragment();
+        pf.subreddit = subreddit;
+        pf.requestBody = requestBody;
+        pf.sortingType = sortingType;
+        pf.lFetcher = new PostFetcher(applicationContext, pf.createUrl());
         pf.showSubreddit = showSubreddit;
         return pf;
     }
@@ -166,38 +167,38 @@ public class PostsFragment extends ListFragment<RedditPost> {
     @Override
     View fillItems(final List<RedditPost> posts, View convertView, final int position) {
 
-        if(convertView == null)
-            convertView=getActivity()
+        if (convertView == null)
+            convertView = getActivity()
                     .getLayoutInflater()
                     .inflate(item_layout_id, null);
 
-        TextView title = (TextView)convertView.findViewById(R.id.post_title);
+        TextView title = (TextView) convertView.findViewById(R.id.post_title);
         title.setText(posts.get(position).getTitle());
-        ((TextView)convertView.findViewById(R.id.post_details))
+        ((TextView) convertView.findViewById(R.id.post_details))
                 .setText("submitted " + posts.get(position).getDate() + " ago by "
-                + posts.get(position).getAuthor() + " (" + posts.get(position).getDomain() + ")");
-        ((TextView)convertView.findViewById(R.id.post_comments))
+                        + posts.get(position).getAuthor() + " (" + posts.get(position).getDomain() + ")");
+        ((TextView) convertView.findViewById(R.id.post_comments))
                 .setText(posts.get(position).getNumComments() + " comments");
-        ((TextView)convertView.findViewById(R.id.post_score))
+        ((TextView) convertView.findViewById(R.id.post_score))
                 .setText(String.valueOf(posts.get(position).getPoints()));
 
         //Change color if the post was previously visited.
         //Note that reddit doesn't actually save this information so there is no way to sync this
         //across devices/installs.
         RedditLogin rl = new RedditLogin(getContext());
-        if(rl.isLoggedIn()) {
+        if (rl.isLoggedIn()) {
             SharedPreferences sprefs = getContext()
                     .getSharedPreferences(Consts.SPREFS_READ_POSTS + rl.getCurrentUser(),
                             Context.MODE_PRIVATE);
-            if(sprefs.getString(posts.get(position).getName(), "false").equals("true"))
+            if (sprefs.getString(posts.get(position).getName(), "false").equals("true"))
                 title.setTextColor(ContextCompat.getColor(getContext(), R.color.visited));
             else //Get default color in case the view is recycled, don't really know a better way to do this
                 title.setTextColor(new TextView(getContext()).getTextColors().getDefaultColor());
         }
 
-        final TextView score = (TextView)convertView.findViewById(R.id.post_score);
-        final ImageView upvoteArrow = (ImageView)convertView.findViewById(R.id.upvote_arrow);
-        final ImageView downvoteArrow = (ImageView)convertView.findViewById(R.id.downvote_arrow);
+        final TextView score = (TextView) convertView.findViewById(R.id.post_score);
+        final ImageView upvoteArrow = (ImageView) convertView.findViewById(R.id.upvote_arrow);
+        final ImageView downvoteArrow = (ImageView) convertView.findViewById(R.id.downvote_arrow);
 
         //Make sure to reset colors in case view is recycled
         upvoteArrow.setColorFilter(ContextCompat
@@ -207,32 +208,30 @@ public class PostsFragment extends ListFragment<RedditPost> {
         score.setTextColor(ContextCompat
                 .getColor(getContext(), android.R.color.darker_gray));
 
-        if(posts.get(position).isUpvoted()) {
+        if (posts.get(position).isUpvoted()) {
             upvoteArrow.setColorFilter(ContextCompat
                     .getColor(getContext(), R.color.upvoteOrange));
             score.setTextColor(ContextCompat
                     .getColor(getContext(), R.color.upvoteOrange));
-        }
-        else if(posts.get(position).isDownvoted()) {
+        } else if (posts.get(position).isDownvoted()) {
             downvoteArrow.setColorFilter(ContextCompat
                     .getColor(getContext(), R.color.downvoteBlue));
             score.setTextColor(ContextCompat
                     .getColor(getContext(), R.color.downvoteBlue));
         }
         //Adds subreddit name to the view (eg when displaying posts from /r/all)
-        if(showSubreddit) {
+        if (showSubreddit) {
             ((TextView) convertView.findViewById(R.id.post_subreddit))
                     .setText(posts.get(position).getSubreddit());
         }
 
         //Selfposts don't contain external links
-        if(posts.get(position).getDomain().startsWith("self")) {
+        if (posts.get(position).getDomain().startsWith("self")) {
             convertView.findViewById(R.id.browser_image)
                     .setVisibility(View.GONE);
             convertView.findViewById(R.id.link_thumbnail)
                     .setVisibility(View.GONE);
-        }
-        else if(!posts.get(position).getThumbnailUrl().equals("")) {
+        } else if (!posts.get(position).getThumbnailUrl().equals("")) {
             //image link, load thumbnail
             convertView.findViewById(R.id.browser_image)
                     .setVisibility(View.GONE);
@@ -246,9 +245,9 @@ public class PostsFragment extends ListFragment<RedditPost> {
                             new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    if(posts.get(position).getUrl().endsWith("jpg")) {
+                                    if (posts.get(position).getUrl().endsWith("jpg")) {
                                         ImageFragment imf =
-                                                (ImageFragment)ImageFragment.newInstance(
+                                                (ImageFragment) ImageFragment.newInstance(
                                                         getContext(), posts.get(position).getUrl());
                                         getFragmentManager().beginTransaction()
                                                 .replace(R.id.fragments_container, imf)
@@ -258,8 +257,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
                                 }
                             }
                     );
-        }
-        else {
+        } else {
             convertView.findViewById(R.id.browser_image)
                     .setVisibility(View.VISIBLE);
             convertView.findViewById(R.id.link_thumbnail)
@@ -286,7 +284,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
         upvoteArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!new RedditLogin(getContext()).isLoggedIn()) {
+                if (!new RedditLogin(getContext()).isLoggedIn()) {
                     Toast.makeText(getContext(), "Need to be logged in to vote.",
                             Toast.LENGTH_LONG).show();
                     return;
@@ -304,7 +302,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
         downvoteArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!new RedditLogin(getContext()).isLoggedIn()) {
+                if (!new RedditLogin(getContext()).isLoggedIn()) {
                     Toast.makeText(getContext(), "Need to be logged in to vote.",
                             Toast.LENGTH_LONG).show();
                     return;
@@ -329,7 +327,7 @@ public class PostsFragment extends ListFragment<RedditPost> {
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
                 RedditLogin rl = new RedditLogin(getContext());
-                if(rl.isLoggedIn()) {
+                if (rl.isLoggedIn()) {
                     SharedPreferences.Editor edit = getContext()
                             .getSharedPreferences(Consts.SPREFS_READ_POSTS + rl.getCurrentUser(),
                                     Context.MODE_PRIVATE).edit();

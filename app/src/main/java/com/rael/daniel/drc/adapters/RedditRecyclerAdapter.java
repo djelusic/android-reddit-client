@@ -97,6 +97,7 @@ public abstract class RedditRecyclerAdapter<T> extends
             return getHolder(view);
         }
         else {
+            //Show progress bar
             View view = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.progress_item, viewGroup, false);
             return new ProgressViewHolder(view);

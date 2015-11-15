@@ -20,11 +20,11 @@ public class ImgurConnectionManager {
     /*
         * Connect to Imgur via HTTP
         * */
-    public static HttpURLConnection getConnection(String url){
-        System.out.println("URL: "+url);
+    public static HttpURLConnection getConnection(String url) {
+        System.out.println("URL: " + url);
         HttpURLConnection conn = null;
         try {
-            conn=(HttpURLConnection)new URL(url).openConnection();
+            conn = (HttpURLConnection) new URL(url).openConnection();
             conn.setReadTimeout(30000); // Timeout at 30 seconds
             conn.setRequestProperty("Authorization", "Client-ID "
                     + Consts.IMGUR_CLIENT_ID);
@@ -41,26 +41,26 @@ public class ImgurConnectionManager {
     /*
     * Read data from URL
     * */
-    public static String readContents(String url){
-        HttpURLConnection conn=getConnection(url);
-        if(conn==null) return null;
-        try{
-            if(conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+    public static String readContents(String url) {
+        HttpURLConnection conn = getConnection(url);
+        if (conn == null) return null;
+        try {
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 Log.d("HTTP error", String.valueOf(conn.getResponseCode()));
                 return "HTTP error " + conn.getResponseCode();
             }
-            StringBuilder sb=new StringBuilder(8192);
+            StringBuilder sb = new StringBuilder(8192);
             String tmp;
-            BufferedReader br=new BufferedReader(
+            BufferedReader br = new BufferedReader(
                     new InputStreamReader(
                             conn.getInputStream()
                     )
             );
-            while((tmp=br.readLine())!=null)
+            while ((tmp = br.readLine()) != null)
                 sb.append(tmp).append("\n");
             br.close();
             return sb.toString();
-        }catch(IOException e){
+        } catch (IOException e) {
             Log.d("READ FAILED", e.toString());
             return "READ FAILED: " + e.toString();
         }

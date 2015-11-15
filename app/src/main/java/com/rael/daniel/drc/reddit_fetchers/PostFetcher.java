@@ -35,15 +35,15 @@ public class PostFetcher extends ListFetcher<RedditPost> {
                 new RedditConnectionManager(applicationContext);
         rawData = conn.readContents(url);
         try {
-            JSONObject data=new JSONObject(rawData)
+            JSONObject data = new JSONObject(rawData)
                     .getJSONObject("data");
-            JSONArray children=data.getJSONArray("children");
-            after=data.getString("after");
+            JSONArray children = data.getJSONArray("children");
+            after = data.getString("after");
 
-            for(int i=0;i<children.length();i++){
-                JSONObject cur=children.getJSONObject(i)
+            for (int i = 0; i < children.length(); i++) {
+                JSONObject cur = children.getJSONObject(i)
                         .getJSONObject("data");
-                RedditPost post=new RedditPost();
+                RedditPost post = new RedditPost();
                 post.setTitle(cur.optString("title"));
                 post.setUrl(cur.optString("url"));
                 post.setNumComments(cur.optInt("num_comments"));
@@ -59,42 +59,17 @@ public class PostFetcher extends ListFetcher<RedditPost> {
                 post.setDate(TimeSpan
                         .calculateTimeSpan(new BigDecimal(cur.getString("created_utc"))
                                 .longValue(), System.currentTimeMillis() / 1000l));
-                /*if(post.getDomain().contains("imgur")) {
-                    if (!post.getUrl().contains("/gallery/")
-                            && !post.getUrl().contains("/a/")) {
-                        post.setPicassoUrl("https://i.imgur.com/" +
-                                ImgurGalleryFetcher.getGalleryId(post
-                                        .getUrl()) + "s.jpg");
-                    } else {
-                        List<ImgurImage> imageList = null;
-                        if(post.getUrl().contains("/gallery/")) {
-                            imageList = ImgurGalleryFetcher
-                                    .getImagesFromGallery(ImgurGalleryFetcher
-                                            .getGalleryId(post.getUrl()), true, false);
-                        }
-                        if(post.getUrl().contains("/a/")) {
-                            imageList = ImgurGalleryFetcher
-                                    .getImagesFromGallery(ImgurGalleryFetcher
-                                            .getGalleryId(post.getUrl()), true, true);
-                        }
-                        if(imageList != null) {
-                            post.setPicassoUrl(imageList.get(0).getLink());
-                        }
-                    }
-                }
-                else post.setPicassoUrl(null);*/
                 post.setThumbnailUrl(cur.getString("thumbnail"));
-                if(cur.getString("is_self").equals("true"))
+                if (cur.getString("is_self").equals("true"))
                     post.setSelfPost(true);
                 else post.setSelfPost(false);
                 post.setSelftext(Html.fromHtml(cur
                         .optString("selftext_html")).toString());
-                if(post.getTitle() !=null)
+                if (post.getTitle() != null)
                     postList.add(post);
             }
-        }
-        catch(Exception e){
-        Log.e("fetchPosts()", e.toString());
+        } catch (Exception e) {
+            Log.e("fetchPosts()", e.toString());
         }
         return postList;
     }

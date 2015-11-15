@@ -15,7 +15,7 @@ import com.rael.daniel.drc.reddit_objects.RedditSubreddit;
 import java.util.List;
 
 /**
- * Created by Daniel on 05/11/2015.
+ * Adapter for subreddits RecyclerView
  */
 public class SubredditsRecyclerAdapter extends RedditRecyclerAdapter<RedditSubreddit> {
     ViewHolder.IViewHolderClick listener;

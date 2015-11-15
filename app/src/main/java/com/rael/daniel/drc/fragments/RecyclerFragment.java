@@ -32,21 +32,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Daniel on 12/10/2015.
+ * Generic fragment for displaying content on Reddit
  */
 public abstract class RecyclerFragment<T> extends Fragment {
     private List<T> list;
-    RecyclerView rView;
-    View contentView;
     RedditRecyclerAdapter<T> adapter;
     ListFetcher<T> lFetcher;
+
+    RecyclerView rView;
+    View contentView;
+
     int layout_id, rlist_id, item_layout_id;
     int fab_icon;
+    int numSubFabsVisible = 0;
+
     boolean initialized = false;
     boolean loadMoreOnScroll = true;
     boolean fabVisibility = false;
     boolean subFabVisibility = false;
-    int numSubFabsVisible = 0;
+
     IFragmentCallback fragmentCallback;
 
     public RecyclerFragment() {
@@ -60,14 +64,14 @@ public abstract class RecyclerFragment<T> extends Fragment {
 
     protected void FABOnClick() {
         //default behavior, main FAB just opens a submenu
-        if(numSubFabsVisible > 0 && !subFabVisibility) {
+        if (numSubFabsVisible > 0 && !subFabVisibility) {
             setSubFABsVisible(numSubFabsVisible);
             subFabVisibility = true;
-        }
-        else hideSubFABs();
+        } else hideSubFABs();
     }
+
     private void setFABOnClickListener() {
-        if(fragmentCallback != null) {
+        if (fragmentCallback != null) {
             fragmentCallback.getFAB().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -76,8 +80,9 @@ public abstract class RecyclerFragment<T> extends Fragment {
             });
         }
     }
+
     protected void setSubFABOnClickListener(int subFabId, View.OnClickListener listener) {
-        if(fragmentCallback != null && listener != null) {
+        if (fragmentCallback != null && listener != null) {
             fragmentCallback.getSubFAB(subFabId).setOnClickListener(listener);
         }
     }
@@ -88,7 +93,7 @@ public abstract class RecyclerFragment<T> extends Fragment {
         setRetainInstance(true);
     }
 
-    public static Fragment newInstance(){
+    public static Fragment newInstance() {
         return null; //implement later
     }
 
@@ -99,10 +104,10 @@ public abstract class RecyclerFragment<T> extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        contentView=inflater.inflate(layout_id
+        contentView = inflater.inflate(layout_id
                 , container
                 , false);
-        rView =(RecyclerView)contentView.findViewById(rlist_id);
+        rView = (RecyclerView) contentView.findViewById(rlist_id);
         rView.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(getContext()));
         initialize(false);
         initialized = true;
@@ -114,21 +119,20 @@ public abstract class RecyclerFragment<T> extends Fragment {
                 (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
         params.setBehavior(new ScrollAwareFABBehavior(!visibility));
         fab.setLayoutParams(params);
-        if(visibility) fab.show();
+        if (visibility) fab.show();
         else fab.hide();
     }
 
     protected void setSubFABsVisible(int numSubFabsVisible) {
-        for(int i = 0; i < 3; i++) {
-            if(i < numSubFabsVisible) {
+        for (int i = 0; i < 3; i++) {
+            if (i < numSubFabsVisible) {
                 setFABVisibility(fragmentCallback.getSubFAB(2 - i), true);
-            }
-            else setFABVisibility(fragmentCallback.getSubFAB(2 - i), false);
+            } else setFABVisibility(fragmentCallback.getSubFAB(2 - i), false);
         }
     }
 
     protected void hideSubFABs() {
-        for(int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             setFABVisibility(fragmentCallback.getSubFAB(i), false);
         }
         subFabVisibility = false;
@@ -138,12 +142,12 @@ public abstract class RecyclerFragment<T> extends Fragment {
         Drawable mDrawable = getContext().getDrawable(drawable);
         TypedValue typedValue = new TypedValue();
         getContext().getTheme().resolveAttribute(R.attr.drawableColor, typedValue, true);
-        if(mDrawable != null) mDrawable.mutate().setTint(typedValue.data);
+        if (mDrawable != null) mDrawable.mutate().setTint(typedValue.data);
         fab.setImageDrawable(mDrawable);
     }
 
     protected void setSubFABIcon(int position, int drawable) {
-        if(fragmentCallback != null) {
+        if (fragmentCallback != null) {
             fragmentCallback.getSubFAB(position).setImageDrawable(
                     getContext().getDrawable(drawable));
         }
@@ -152,7 +156,7 @@ public abstract class RecyclerFragment<T> extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof IFragmentCallback) {
+        if (context instanceof IFragmentCallback) {
             fragmentCallback = (IFragmentCallback) context;
             setFABVisibility(fragmentCallback.getFAB(), fabVisibility);
             setFABIcon(fragmentCallback.getFAB(), fab_icon);
@@ -179,13 +183,14 @@ public abstract class RecyclerFragment<T> extends Fragment {
     }
 
     private void setLoadMoreListener() {
-        if(!loadMoreOnScroll) return;
+        if (!loadMoreOnScroll) return;
         adapter.setOnLoadMoreListener(new RedditRecyclerAdapter.OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
                 if (lFetcher.hasMoreItems()) {
                     new AsyncTask<Void, Void, Void>() {
                         List<T> newList;
+
                         @Override
                         protected void onPreExecute() {
                             super.onPreExecute();
@@ -193,11 +198,13 @@ public abstract class RecyclerFragment<T> extends Fragment {
                             list.add(null);
                             adapter.notifyItemInserted(list.size() - 1);
                         }
+
                         @Override
                         protected Void doInBackground(Void... params) {
                             newList = lFetcher.getMoreItems();
                             return null;
                         }
+
                         @Override
                         protected void onPostExecute(Void aVoid) {
                             //remove the null element
@@ -216,11 +223,11 @@ public abstract class RecyclerFragment<T> extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(fragmentCallback.isStateChanged()) {
+        if (fragmentCallback.isStateChanged()) {
             myRefresh();
             fragmentCallback.setStateChanged(false);
         }
-        if(getActivity() instanceof IFragmentCallback) {
+        if (getActivity() instanceof IFragmentCallback) {
             fragmentCallback = (IFragmentCallback) getActivity();
             setFABVisibility(fragmentCallback.getFAB(), fabVisibility);
             setFABIcon(fragmentCallback.getFAB(), fab_icon);
@@ -234,19 +241,19 @@ public abstract class RecyclerFragment<T> extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == Activity.RESULT_OK)
+        if (resultCode == Activity.RESULT_OK)
             myRefresh();
     }
 
-    protected void initialize(final boolean isUpdate){
+    protected void initialize(final boolean isUpdate) {
 
-        if(!initialized){
+        if (!initialized) {
             new AsyncTask<Void, Void, String>() {
                 @Override
                 protected void onPreExecute() {
                     super.onPreExecute();
                     // Show progress bar
-                    if(contentView != null) { //Make sure the fragment is still visible
+                    if (contentView != null) { //Make sure the fragment is still visible
                         contentView.findViewById(R.id.errors)
                                 .setVisibility(View.GONE);
                         list.add(0, null);
@@ -269,8 +276,8 @@ public abstract class RecyclerFragment<T> extends Fragment {
                     list.remove(0);
                     adapter.notifyItemRemoved(0);
                     //Handle potential errors returned by the API
-                    if(result != null && contentView != null) {
-                        TextView errors = (TextView)contentView
+                    if (result != null && contentView != null) {
+                        TextView errors = (TextView) contentView
                                 .findViewById(R.id.errors);
                         errors.setText(lFetcher.getErrors());
                         errors.setVisibility(View.VISIBLE);
@@ -279,19 +286,19 @@ public abstract class RecyclerFragment<T> extends Fragment {
                         return;
                     }
                     // Hide progress bar
-                    else if(contentView != null) {
+                    else if (contentView != null) {
                         contentView.findViewById(R.id.errors)
                                 .setVisibility(View.GONE);
                     }
-                    if(isUpdate)
+                    if (isUpdate)
                         adapter.notifyDataSetChanged();
                     else {
                         setLoadMoreListener();
                         adapter.notifyDataSetChanged();
                     }
                 }
-            }.execute((Void)null);
-        }else{
+            }.execute((Void) null);
+        } else {
             createAndBindAdapter();
             setLoadMoreListener();
         }
@@ -302,7 +309,9 @@ public abstract class RecyclerFragment<T> extends Fragment {
     }
 
     protected abstract ListFetcher<T> getFetcher();
+
     protected abstract void createAndBindAdapter();
 
-    protected void getAdditionalItems() {}
+    protected void getAdditionalItems() {
+    }
 }
