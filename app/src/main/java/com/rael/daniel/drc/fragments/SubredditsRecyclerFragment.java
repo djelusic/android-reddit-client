@@ -29,11 +29,11 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
 
     @Override
     public void myRefresh() {
-        initialized = false;
         getList().clear();
         lFetcher = new SubredditFetcher(getActivity()
                 .getApplicationContext());
-        initialize(false);
+        rView.clearOnScrollListeners();
+        initialize();
     }
 
     @Override

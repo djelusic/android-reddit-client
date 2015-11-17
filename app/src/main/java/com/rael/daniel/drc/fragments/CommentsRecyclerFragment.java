@@ -37,10 +37,10 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
 
     @Override
     public void myRefresh() {
-        initialized = false;
         getList().clear();
         lFetcher = new CommentFetcher(getContext(), url, 0);
-        initialize(true);
+        rView.clearOnScrollListeners();
+        initialize();
     }
 
     public static Fragment newInstance(Context applicationContext, String url,

@@ -58,6 +58,7 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
             innerLayout = (ViewGroup) itemView.findViewById(
                     R.id.comment_inner_layout);
             divider = itemView.findViewById(R.id.divider);
+            commentText.setOnClickListener(this);
         }
     }
 

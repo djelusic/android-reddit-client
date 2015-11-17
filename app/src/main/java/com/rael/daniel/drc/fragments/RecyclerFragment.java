@@ -46,7 +46,6 @@ public abstract class RecyclerFragment<T> extends Fragment {
     int fab_icon;
     int numSubFabsVisible = 0;
 
-    boolean initialized = false;
     boolean loadMoreOnScroll = true;
     boolean fabVisibility = false;
     boolean subFabVisibility = false;
@@ -109,8 +108,7 @@ public abstract class RecyclerFragment<T> extends Fragment {
                 , false);
         rView = (RecyclerView) contentView.findViewById(rlist_id);
         rView.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(getContext()));
-        initialize(false);
-        initialized = true;
+        initialize();
         return contentView;
     }
 
@@ -208,9 +206,9 @@ public abstract class RecyclerFragment<T> extends Fragment {
                         @Override
                         protected void onPostExecute(Void aVoid) {
                             //remove the null element
+                            adapter.setLoaded();
                             list.remove(list.size() - 1);
                             adapter.notifyItemRemoved(list.size() - 1);
-                            adapter.setLoaded();
                             list.addAll(newList);
                             adapter.notifyDataSetChanged();
                         }
@@ -245,63 +243,53 @@ public abstract class RecyclerFragment<T> extends Fragment {
             myRefresh();
     }
 
-    protected void initialize(final boolean isUpdate) {
-
-        if (!initialized) {
-            new AsyncTask<Void, Void, String>() {
-                @Override
-                protected void onPreExecute() {
-                    super.onPreExecute();
-                    // Show progress bar
-                    if (contentView != null) { //Make sure the fragment is still visible
-                        contentView.findViewById(R.id.errors)
-                                .setVisibility(View.GONE);
-                        list.add(0, null);
-                        createAndBindAdapter();
-                    }
+    protected void initialize() {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                // Show progress bar
+                if (contentView != null) { //Make sure the fragment is still visible
+                    contentView.findViewById(R.id.errors)
+                            .setVisibility(View.GONE);
+                    list.add(0, null);
+                    createAndBindAdapter();
                 }
+            }
 
-                @Override
-                protected String doInBackground(Void... params) {
-                    // populate the main list
-                    getList().addAll(lFetcher.getItems());
-                    // get any additional items (such as selfposts)
-                    getAdditionalItems();
-                    return lFetcher.getErrors();
-                }
+            @Override
+            protected String doInBackground(Void... params) {
+                // populate the main list
+                getList().addAll(lFetcher.getItems());
+                // get any additional items (such as selfposts)
+                getAdditionalItems();
+                return lFetcher.getErrors();
+            }
 
-                @Override
-                protected void onPostExecute(String result) {
-                    super.onPostExecute(result);
-                    list.remove(0);
-                    adapter.notifyItemRemoved(0);
-                    //Handle potential errors returned by the API
-                    if (result != null && contentView != null) {
-                        TextView errors = (TextView) contentView
-                                .findViewById(R.id.errors);
-                        errors.setText(lFetcher.getErrors());
-                        errors.setVisibility(View.VISIBLE);
-                        contentView.findViewById(R.id.list_progress)
-                                .setVisibility(View.GONE);
-                        return;
-                    }
-                    // Hide progress bar
-                    else if (contentView != null) {
-                        contentView.findViewById(R.id.errors)
-                                .setVisibility(View.GONE);
-                    }
-                    if (isUpdate)
-                        adapter.notifyDataSetChanged();
-                    else {
-                        setLoadMoreListener();
-                        adapter.notifyDataSetChanged();
-                    }
+            @Override
+            protected void onPostExecute(String result) {
+                super.onPostExecute(result);
+                list.remove(0);
+                adapter.notifyItemRemoved(0);
+                //Handle potential errors returned by the API
+                if (result != null && contentView != null) {
+                    TextView errors = (TextView) contentView
+                            .findViewById(R.id.errors);
+                    errors.setText(lFetcher.getErrors());
+                    errors.setVisibility(View.VISIBLE);
+                    contentView.findViewById(R.id.list_progress)
+                            .setVisibility(View.GONE);
+                    return;
                 }
-            }.execute((Void) null);
-        } else {
-            createAndBindAdapter();
-            setLoadMoreListener();
-        }
+                // Hide progress bar
+                else if (contentView != null) {
+                    contentView.findViewById(R.id.errors)
+                            .setVisibility(View.GONE);
+                }
+                setLoadMoreListener();
+                adapter.notifyDataSetChanged();
+            }
+        }.execute((Void) null);
     }
 
     public List<T> getList() {

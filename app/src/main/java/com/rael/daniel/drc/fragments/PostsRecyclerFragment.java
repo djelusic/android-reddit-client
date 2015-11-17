@@ -64,11 +64,11 @@ public class PostsRecyclerFragment extends RecyclerFragment<RedditPost> {
 
     @Override
     public void myRefresh() {
-        initialized = false;
         getList().clear();
         lFetcher = new PostFetcher(getActivity()
                 .getApplicationContext(), createUrl());
-        initialize(false);
+        rView.clearOnScrollListeners();
+        initialize();
     }
 
     public static Fragment newInstance(Context applicationContext,
