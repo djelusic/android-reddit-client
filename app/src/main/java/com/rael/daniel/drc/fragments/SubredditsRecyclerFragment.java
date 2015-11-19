@@ -33,6 +33,7 @@ public class SubredditsRecyclerFragment extends RecyclerFragment<RedditSubreddit
         lFetcher = new SubredditFetcher(getActivity()
                 .getApplicationContext());
         rView.clearOnScrollListeners();
+        initialized = false;
         initialize();
     }
 

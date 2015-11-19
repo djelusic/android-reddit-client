@@ -49,6 +49,7 @@ public abstract class RecyclerFragment<T> extends Fragment {
     boolean loadMoreOnScroll = true;
     boolean fabVisibility = false;
     boolean subFabVisibility = false;
+    boolean initialized = false;
 
     IFragmentCallback fragmentCallback;
 
@@ -244,52 +245,58 @@ public abstract class RecyclerFragment<T> extends Fragment {
     }
 
     protected void initialize() {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                // Show progress bar
-                if (contentView != null) { //Make sure the fragment is still visible
-                    contentView.findViewById(R.id.errors)
-                            .setVisibility(View.GONE);
-                    list.add(0, null);
-                    createAndBindAdapter();
+        if(!initialized) {
+            new AsyncTask<Void, Void, String>() {
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    // Show progress bar
+                    if (contentView != null) { //Make sure the fragment is still visible
+                        contentView.findViewById(R.id.errors)
+                                .setVisibility(View.GONE);
+                        list.add(0, null);
+                        createAndBindAdapter();
+                    }
                 }
-            }
 
-            @Override
-            protected String doInBackground(Void... params) {
-                // populate the main list
-                getList().addAll(lFetcher.getItems());
-                // get any additional items (such as selfposts)
-                getAdditionalItems();
-                return lFetcher.getErrors();
-            }
+                @Override
+                protected String doInBackground(Void... params) {
+                    // populate the main list
+                    getList().addAll(lFetcher.getItems());
+                    // get any additional items (such as selfposts)
+                    getAdditionalItems();
+                    return lFetcher.getErrors();
+                }
 
-            @Override
-            protected void onPostExecute(String result) {
-                super.onPostExecute(result);
-                list.remove(0);
-                adapter.notifyItemRemoved(0);
-                //Handle potential errors returned by the API
-                if (result != null && contentView != null) {
-                    TextView errors = (TextView) contentView
-                            .findViewById(R.id.errors);
-                    errors.setText(lFetcher.getErrors());
-                    errors.setVisibility(View.VISIBLE);
-                    contentView.findViewById(R.id.list_progress)
-                            .setVisibility(View.GONE);
-                    return;
+                @Override
+                protected void onPostExecute(String result) {
+                    super.onPostExecute(result);
+                    list.remove(0);
+                    adapter.notifyItemRemoved(0);
+                    //Handle potential errors returned by the API
+                    if (result != null && contentView != null) {
+                        TextView errors = (TextView) contentView
+                                .findViewById(R.id.errors);
+                        errors.setText(lFetcher.getErrors());
+                        errors.setVisibility(View.VISIBLE);
+                        contentView.findViewById(R.id.list_progress)
+                                .setVisibility(View.GONE);
+                        return;
+                    }
+                    // Hide progress bar
+                    else if (contentView != null) {
+                        contentView.findViewById(R.id.errors)
+                                .setVisibility(View.GONE);
+                    }
+                    setLoadMoreListener();
+                    adapter.notifyDataSetChanged();
+                    initialized = true;
                 }
-                // Hide progress bar
-                else if (contentView != null) {
-                    contentView.findViewById(R.id.errors)
-                            .setVisibility(View.GONE);
-                }
-                setLoadMoreListener();
-                adapter.notifyDataSetChanged();
-            }
-        }.execute((Void) null);
+            }.execute((Void) null);
+        }
+        else {
+            createAndBindAdapter();
+        }
     }
 
     public List<T> getList() {

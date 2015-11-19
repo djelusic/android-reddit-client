@@ -3,6 +3,7 @@ package com.rael.daniel.drc.reddit_api;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.rael.daniel.drc.adapters.CommentsRecyclerAdapter;
 import com.rael.daniel.drc.fragments.CommentsFragment;
 import com.rael.daniel.drc.reddit_fetchers.CommentFetcher;
 import com.rael.daniel.drc.reddit_objects.RedditComment;
@@ -20,17 +21,17 @@ public class GetMoreCommentsTask extends AsyncTask<Void, Void, List<RedditCommen
 
     private Context applicationContext;
     private List<RedditComment> comments;
-    private CommentsFragment commentsFragment;
+    private CommentsRecyclerAdapter commentsAdapter;
     private String link_id;
     private String[] children;
     private int startingDepth;
     private int position;
 
-    public GetMoreCommentsTask(CommentsFragment commentsFragment,
+    public GetMoreCommentsTask(CommentsRecyclerAdapter commentsAdapter,
                                String link_id, int position) {
-        this.applicationContext = commentsFragment.getContext();
-        this.commentsFragment = commentsFragment;
-        this.comments = commentsFragment.getList();
+        this.applicationContext = commentsAdapter.getApplicationContext();
+        this.commentsAdapter = commentsAdapter;
+        this.comments = commentsAdapter.getList();
         this.link_id = link_id;
         this.children = comments.get(position).getMoreChildren();
         this.startingDepth = comments.get(position).getDepth();
@@ -60,8 +61,9 @@ public class GetMoreCommentsTask extends AsyncTask<Void, Void, List<RedditCommen
         super.onPostExecute(moreComments);
         //Remove the "more comments" stub
         comments.remove(position);
-        //Add fetches comments to comments list
+        commentsAdapter.notifyItemRemoved(position);
+        //Add fetched comments to comments list
         comments.addAll(position, moreComments);
-        commentsFragment.notifyChange();
+        commentsAdapter.notifyItemRangeInserted(position, moreComments.size());
     }
 }

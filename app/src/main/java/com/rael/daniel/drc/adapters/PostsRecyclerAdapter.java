@@ -92,38 +92,38 @@ public class PostsRecyclerAdapter extends RedditRecyclerAdapter<RedditPost> {
         //Change color if the post was previously visited.
         //Note that reddit doesn't actually save this information so there is no way to sync this
         //across devices/installs.
-        RedditLogin rl = new RedditLogin(applicationContext);
+        RedditLogin rl = new RedditLogin(getApplicationContext());
         if(rl.isLoggedIn()) {
-            SharedPreferences sprefs = applicationContext
+            SharedPreferences sprefs = getApplicationContext()
                     .getSharedPreferences(Consts.SPREFS_READ_POSTS + rl.getCurrentUser(),
                             Context.MODE_PRIVATE);
             if(sprefs.getString(getList().get(position).getName(), "false").equals("true"))
                 postViewHolder.postTitle.setTextColor(ContextCompat
-                        .getColor(applicationContext, R.color.visited));
+                        .getColor(getApplicationContext(), R.color.visited));
             else //Get default color in case the view is recycled, don't really know a better way to do this
-                postViewHolder.postTitle.setTextColor(new TextView(applicationContext)
+                postViewHolder.postTitle.setTextColor(new TextView(getApplicationContext())
                         .getTextColors().getDefaultColor());
         }
 
         //Make sure to reset colors in case view is recycled
         postViewHolder.upvoteArrow.setColorFilter(ContextCompat
-                .getColor(applicationContext, android.R.color.darker_gray));
+                .getColor(getApplicationContext(), android.R.color.darker_gray));
         postViewHolder.downvoteArrow.setColorFilter(ContextCompat
-                .getColor(applicationContext, android.R.color.darker_gray));
+                .getColor(getApplicationContext(), android.R.color.darker_gray));
         postViewHolder.postScore.setTextColor(ContextCompat
-                .getColor(applicationContext, android.R.color.darker_gray));
+                .getColor(getApplicationContext(), android.R.color.darker_gray));
 
         if(getList().get(position).isUpvoted()) {
             postViewHolder.upvoteArrow.setColorFilter(ContextCompat
-                    .getColor(applicationContext, R.color.upvoteOrange));
+                    .getColor(getApplicationContext(), R.color.upvoteOrange));
             postViewHolder.postScore.setTextColor(ContextCompat
-                    .getColor(applicationContext, R.color.upvoteOrange));
+                    .getColor(getApplicationContext(), R.color.upvoteOrange));
         }
         else if(getList().get(position).isDownvoted()) {
             postViewHolder.downvoteArrow.setColorFilter(ContextCompat
-                    .getColor(applicationContext, R.color.downvoteBlue));
+                    .getColor(getApplicationContext(), R.color.downvoteBlue));
             postViewHolder.postScore.setTextColor(ContextCompat
-                    .getColor(applicationContext, R.color.downvoteBlue));
+                    .getColor(getApplicationContext(), R.color.downvoteBlue));
         }
         //Adds subreddit name to the view (eg when displaying posts from /r/all)
         if(showSubreddit) {
@@ -133,7 +133,7 @@ public class PostsRecyclerAdapter extends RedditRecyclerAdapter<RedditPost> {
         //Selfposts don't contain external links
         if(getList().get(position).getDomain().startsWith("self")) {
             postViewHolder.browserImage.setVisibility(View.VISIBLE);
-            postViewHolder.browserImage.setImageDrawable(applicationContext
+            postViewHolder.browserImage.setImageDrawable(getApplicationContext()
                     .getDrawable(R.drawable.ic_play_circle_outline_white_24dp));
             postViewHolder.linkThumbnail.setVisibility(View.GONE);
         }
@@ -145,14 +145,14 @@ public class PostsRecyclerAdapter extends RedditRecyclerAdapter<RedditPost> {
             postViewHolder.linkThumbnail
                     .setVisibility(View.VISIBLE);
             float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    35, applicationContext.getResources().getDisplayMetrics());
-            Picasso.with(applicationContext).load(getList().get(position)
+                    35, getApplicationContext().getResources().getDisplayMetrics());
+            Picasso.with(getApplicationContext()).load(getList().get(position)
                     .getThumbnailUrl()).transform(new RoundedTransformation(10, 0))
                     .resize((int) px, (int) px).centerCrop().into(postViewHolder.linkThumbnail);
         }
         else {
             postViewHolder.browserImage.setVisibility(View.VISIBLE);
-            postViewHolder.browserImage.setImageDrawable(applicationContext
+            postViewHolder.browserImage.setImageDrawable(getApplicationContext()
                     .getDrawable(R.drawable.ic_language_black_24dp));
             postViewHolder.linkThumbnail.setVisibility(View.GONE);
         }

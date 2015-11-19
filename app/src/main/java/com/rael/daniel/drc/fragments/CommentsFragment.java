@@ -332,12 +332,12 @@ public class CommentsFragment extends ListFragment<RedditComment>{
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
                 //Load more comments if user touches a "more comments" stub
-                if(position > 1 && comments.get(position)
+                /*if(position > 1 && comments.get(position)
                         .getUser().equals("more")) {
                     GetMoreCommentsTask tsk = new GetMoreCommentsTask(CommentsFragment.this,
                             link.getName(), position);
                     tsk.execute((Void)null);
-                }
+                }*/
 
                 //Load link in browser
                 if(position == 0 && !link.isSelfPost()) {

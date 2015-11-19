@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.rael.daniel.drc.R;
 import com.rael.daniel.drc.fragments.CommentsRecyclerFragment;
+import com.rael.daniel.drc.reddit_api.GetMoreCommentsTask;
 import com.rael.daniel.drc.reddit_objects.RedditComment;
 import com.rael.daniel.drc.reddit_objects.RedditPost;
 
@@ -135,15 +136,26 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
         if (viewType == VIEW_TYPE_HEADER && link != null) {
             View view = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.op_comment_layout, viewGroup, false);
-            return new OPCommentViewHolder(view, null);
+            return new OPCommentViewHolder(view, new ViewHolder.IViewHolderClick() {
+                @Override
+                public void onClick(View v, int position) {}
+            });
         }
         if (viewType == VIEW_TYPE_MORE_COMMENTS_STUB) {
             View view = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.more_comments_layout, viewGroup, false);
-            return new MoreCommentsStubHolder(view, null);
+            return new MoreCommentsStubHolder(view, new ViewHolder.IViewHolderClick() {
+                @Override
+                public void onClick(View v, int position) {
+                    GetMoreCommentsTask tsk = new GetMoreCommentsTask(
+                            CommentsRecyclerAdapter.this,
+                            link.getName(), position - 1);
+                    tsk.execute((Void)null);
+                }
+            });
         }
         if (viewType == VIEW_TYPE_COLLAPSED_ITEM) {
-            return new RecyclerView.ViewHolder(new View(applicationContext)) {
+            return new RecyclerView.ViewHolder(new View(getApplicationContext())) {
                 @Override
                 public String toString() {
                     return super.toString();
@@ -160,7 +172,7 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
     private void addRedditCommentStyle(ViewGroup outerLayout, ViewGroup innerLayout, int position) {
         //get primary color
         TypedValue typedValue = new TypedValue();
-        applicationContext.getTheme()
+        getApplicationContext().getTheme()
                 .resolveAttribute(R.attr.commentBackgroundPrimary, typedValue, true);
         //we don't want top level comments to have a divider on the left side
         if (getItem(position).getDepth() == 0) {
@@ -171,7 +183,7 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
         }
         outerLayout.removeAllViews();
         for (int i = 0; i < getItem(position).getDepth(); i++) {
-            View v = new View(applicationContext);
+            View v = new View(getApplicationContext());
             if (i == 0) {
                 v.setBackgroundColor(typedValue.data);
             } else {
@@ -219,10 +231,10 @@ public class CommentsRecyclerAdapter extends RedditRecyclerAdapter<RedditComment
             commentHolder.commentTime.setText(" points, " + comment.getDate());
             if (comment.isUpvoted())
                 commentHolder.commentScore.setTextColor(ContextCompat.getColor(
-                        applicationContext, R.color.upvoteOrange));
+                        getApplicationContext(), R.color.upvoteOrange));
             else if (comment.isDownvoted())
                 commentHolder.commentScore.setTextColor(ContextCompat.getColor(
-                        applicationContext, R.color.downvoteBlue));
+                        getApplicationContext(), R.color.downvoteBlue));
             commentHolder.commentText
                     .setMovementMethod(LinkMovementMethod.getInstance());
 

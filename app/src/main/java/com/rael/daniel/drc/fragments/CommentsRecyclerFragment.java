@@ -40,6 +40,7 @@ public class CommentsRecyclerFragment extends RecyclerFragment<RedditComment> {
         getList().clear();
         lFetcher = new CommentFetcher(getContext(), url, 0);
         rView.clearOnScrollListeners();
+        initialized = false;
         initialize();
     }
 

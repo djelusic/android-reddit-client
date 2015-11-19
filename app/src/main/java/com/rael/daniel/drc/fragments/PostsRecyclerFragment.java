@@ -68,6 +68,7 @@ public class PostsRecyclerFragment extends RecyclerFragment<RedditPost> {
         lFetcher = new PostFetcher(getActivity()
                 .getApplicationContext(), createUrl());
         rView.clearOnScrollListeners();
+        initialized = false;
         initialize();
     }
 

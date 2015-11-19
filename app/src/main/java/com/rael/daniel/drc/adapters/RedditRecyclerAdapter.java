@@ -19,7 +19,7 @@ import java.util.List;
 public abstract class RedditRecyclerAdapter<T> extends
         RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<T> list;
-    Context applicationContext;
+    private Context applicationContext;
     int item_layout_id;
 
     private final int VIEW_ITEM = 1;
@@ -137,5 +137,9 @@ public abstract class RedditRecyclerAdapter<T> extends
 
     public void setList(List<T> list) {
         this.list = list;
+    }
+
+    public Context getApplicationContext() {
+        return applicationContext;
     }
 }
