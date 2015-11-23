@@ -157,6 +157,13 @@ public abstract class RecyclerFragment<T> extends Fragment {
         super.onAttach(context);
         if (context instanceof IFragmentCallback) {
             fragmentCallback = (IFragmentCallback) context;
+        }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if(fragmentCallback != null) {
             setFABVisibility(fragmentCallback.getFAB(), fabVisibility);
             setFABIcon(fragmentCallback.getFAB(), fab_icon);
             setFABOnClickListener();
